@@ -1442,6 +1442,7 @@ _PyPegen_run_parser(Parser *p)
     return res;
 }
 
+// tokenizer PyTokenizer_FromFile
 mod_ty
 _PyPegen_run_parser_from_file_pointer(FILE *fp, int start_rule, PyObject *filename_ob,
                              const char *enc, const char *ps1, const char *ps2,

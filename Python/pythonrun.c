@@ -81,12 +81,14 @@ _PyRun_AnyFileObject(FILE *fp, PyObject *filename, int closeit,
 
     int res;
     if (_Py_FdIsInteractive(fp, filename)) {
+        // 交互，循环？
         res = _PyRun_InteractiveLoopObject(fp, filename, flags);
         if (closeit) {
             fclose(fp);
         }
     }
     else {
+        // 文件
         res = _PyRun_SimpleFileObject(fp, filename, closeit, flags);
     }
 
@@ -402,7 +404,7 @@ _PyRun_SimpleFileObject(FILE *fp, PyObject *filename, int closeit,
     PyObject *m, *d, *v;
     int set_file_name = 0, ret = -1;
 
-    m = PyImport_AddModule("__main__");
+    m = PyImport_AddModule("__main__");     // 添加 __main__
     if (m == NULL)
         return -1;
     Py_INCREF(m);
@@ -419,7 +421,7 @@ _PyRun_SimpleFileObject(FILE *fp, PyObject *filename, int closeit,
         }
         set_file_name = 1;
     }
-
+    // .pyc cache
     int pyc = maybe_pyc_file(fp, filename, closeit);
     if (pyc < 0) {
         goto done;
@@ -444,6 +446,7 @@ _PyRun_SimpleFileObject(FILE *fp, PyObject *filename, int closeit,
             fclose(pyc_fp);
             goto done;
         }
+        // 执行.pyc， 直接执行opcode？
         v = run_pyc_file(pyc_fp, d, d, flags);
     } else {
         /* When running from stdin, leave __main__.__loader__ alone */
@@ -453,6 +456,7 @@ _PyRun_SimpleFileObject(FILE *fp, PyObject *filename, int closeit,
             ret = -1;
             goto done;
         }
+        // 执行py，Tokenizer，Parser，ast，opcode vm
         v = pyrun_file(fp, filename, Py_file_input, d, d,
                        closeit, flags);
     }
@@ -1195,7 +1199,7 @@ pyrun_file(FILE *fp, PyObject *filename, int start, PyObject *globals,
     if (arena == NULL) {
         return NULL;
     }
-
+    // 构建语法树？
     mod_ty mod;
     mod = _PyParser_ASTFromFile(fp, filename, NULL, start, NULL, NULL,
                                 flags, NULL, arena);
@@ -1203,7 +1207,7 @@ pyrun_file(FILE *fp, PyObject *filename, int start, PyObject *globals,
     if (closeit) {
         fclose(fp);
     }
-
+    // 执行模块
     PyObject *ret;
     if (mod != NULL) {
         ret = run_mod(mod, filename, globals, locals, flags, arena);
@@ -1211,6 +1215,7 @@ pyrun_file(FILE *fp, PyObject *filename, int start, PyObject *globals,
     else {
         ret = NULL;
     }
+    // 释放内存
     _PyArena_Free(arena);
 
     return ret;
@@ -1301,7 +1306,7 @@ run_mod(mod_ty mod, PyObject *filename, PyObject *globals, PyObject *locals,
             PyCompilerFlags *flags, PyArena *arena)
 {
     PyThreadState *tstate = _PyThreadState_GET();
-    // 获得opcode？
+    // 获得ast opcode？
     PyCodeObject *co = _PyAST_Compile(mod, filename, flags, -1, arena);
     if (co == NULL)
         return NULL;

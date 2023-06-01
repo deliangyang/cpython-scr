@@ -53,6 +53,7 @@ future_check_features(PyFutureFeatures *ff, stmt_ty s, PyObject *filename)
     return 1;
 }
 
+// 解析
 static int
 future_parse(PyFutureFeatures *ff, mod_ty mod, PyObject *filename)
 {
