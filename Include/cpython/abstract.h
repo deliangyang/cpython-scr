@@ -8,7 +8,9 @@
 #  define _PyObject_CallMethodId _PyObject_CallMethodId_SizeT
 #endif
 
-/* Convert keyword arguments from the FASTCALL (stack: C array, kwnames: tuple)
+/* 
+  翻一下下面这段话：
+    Convert keyword arguments from the FASTCALL (stack: C array, kwnames: tuple)
    format to a Python dictionary ("kwargs" dict).
 
    The type of kwnames keys is not checked. The final function getting
@@ -17,7 +19,14 @@
 
    Duplicate keys are merged using the last value. If duplicate keys must raise
    an exception, the caller is responsible to implement an explicit keys on
-   kwnames. */
+   kwnames. 
+   
+    转换关键字参数从FASTCALL（堆栈：C数组，kwnames：元组）格式到Python字典（“kwargs”字典）。
+
+    没有检查kwnames键的类型。最终获取参数的函数负责检查所有键是否都是字符串，例如使用PyArg_ParseTupleAndKeywords（）或PyArg_ValidateKeywordArguments（）。
+
+    重复的键使用最后一个值合并。如果重复的键必须引发异常，则调用者负责在kwnames上实现显式键。
+   */
 PyAPI_FUNC(PyObject *) _PyStack_AsDict(
     PyObject *const *values,
     PyObject *kwnames);

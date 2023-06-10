@@ -1590,14 +1590,14 @@ _PyEval_EvalFrameDefault(PyThreadState *tstate, PyFrameObject *f, int throwflag)
 #endif
     PyObject **stack_pointer;  /* Next free slot in value stack */
     const _Py_CODEUNIT *next_instr;
-    int opcode;        /* Current opcode */
-    int oparg;         /* Current opcode argument, if any */
-    PyObject **fastlocals, **freevars;
+    int opcode;        /* Current opcode 当前操作码 */
+    int oparg;         /* Current opcode argument, if any 当前操作码的参数， */
+    PyObject **fastlocals, **freevars;  // 快速局部变量，自由变量
     PyObject *retval = NULL;            /* Return value */
     _Py_atomic_int * const eval_breaker = &tstate->interp->ceval.eval_breaker;
-    PyCodeObject *co;
+    PyCodeObject *co;   // 代码对象
 
-    const _Py_CODEUNIT *first_instr;
+    const _Py_CODEUNIT *first_instr;    // 第一个操作码
     PyObject *names;
     PyObject *consts;
     _PyOpcache *co_opcache;
@@ -1753,7 +1753,7 @@ main_loop:
            Py_MakePendingCalls() above. */
 
         if (_Py_atomic_load_relaxed(eval_breaker)) {
-            opcode = _Py_OPCODE(*next_instr);
+            opcode = _Py_OPCODE(*next_instr);   // 获取当前指令
             if (opcode != SETUP_FINALLY &&
                 opcode != SETUP_WITH &&
                 opcode != BEFORE_ASYNC_WITH &&
@@ -1784,7 +1784,7 @@ main_loop:
     {
         int instr_prev = f->f_lasti;
         f->f_lasti = INSTR_OFFSET();
-        NEXTOPARG();
+        NEXTOPARG();    // 获取下一条指令，以及参数
 
         if (PyDTrace_LINE_ENABLED())
             maybe_dtrace_line(f, &trace_info, instr_prev);
@@ -1810,7 +1810,7 @@ main_loop:
                 /* trace function raised an exception */
                 goto error;
             }
-            NEXTOPARG();
+            NEXTOPARG();    // 获取下一条指令，以及参数
         }
     }
 
@@ -1853,24 +1853,25 @@ main_loop:
            It is essential that any operation that fails must goto error
            and that all operation that succeed call DISPATCH() ! */
 
-        case TARGET(NOP): {
+        case TARGET(NOP): {         // 什么都不做
             DISPATCH();
         }
 
-        case TARGET(LOAD_FAST): {
-            PyObject *value = GETLOCAL(oparg);
+        case TARGET(LOAD_FAST): {               // 加载局部变量
+            PyObject *value = GETLOCAL(oparg);  // 获取局部变量
             if (value == NULL) {
+                // 局部变量未定义
                 format_exc_check_arg(tstate, PyExc_UnboundLocalError,
                                      UNBOUNDLOCAL_ERROR_MSG,
-                                     PyTuple_GetItem(co->co_varnames, oparg));
+                                     PyTuple_GetItem(co->co_varnames, oparg));  // 抛出异常
                 goto error;
             }
             Py_INCREF(value);
-            PUSH(value);
+            PUSH(value);    // 压栈
             DISPATCH();
         }
 
-        case TARGET(LOAD_CONST): {
+        case TARGET(LOAD_CONST): {  // 加载常量
             PREDICTED(LOAD_CONST);
             PyObject *value = GETITEM(consts, oparg);
             Py_INCREF(value);
@@ -1878,20 +1879,20 @@ main_loop:
             DISPATCH();
         }
 
-        case TARGET(STORE_FAST): {
+        case TARGET(STORE_FAST): {      // 存储局部变量
             PREDICTED(STORE_FAST);
             PyObject *value = POP();
             SETLOCAL(oparg, value);
             DISPATCH();
         }
 
-        case TARGET(POP_TOP): {
+        case TARGET(POP_TOP): {         // 弹出栈顶元素
             PyObject *value = POP();
             Py_DECREF(value);
             DISPATCH();
         }
 
-        case TARGET(ROT_TWO): {
+        case TARGET(ROT_TWO): { // 交换栈顶两个元素
             PyObject *top = TOP();
             PyObject *second = SECOND();
             SET_TOP(second);
@@ -1899,7 +1900,7 @@ main_loop:
             DISPATCH();
         }
 
-        case TARGET(ROT_THREE): {
+        case TARGET(ROT_THREE): {   // 交换栈顶三个元素
             PyObject *top = TOP();
             PyObject *second = SECOND();
             PyObject *third = THIRD();
@@ -1909,7 +1910,7 @@ main_loop:
             DISPATCH();
         }
 
-        case TARGET(ROT_FOUR): {
+        case TARGET(ROT_FOUR): {    // 交换栈顶四个元素
             PyObject *top = TOP();
             PyObject *second = SECOND();
             PyObject *third = THIRD();
@@ -1921,14 +1922,14 @@ main_loop:
             DISPATCH();
         }
 
-        case TARGET(DUP_TOP): {
+        case TARGET(DUP_TOP): { // 复制栈顶元素，并压栈 duplicate top
             PyObject *top = TOP();
             Py_INCREF(top);
             PUSH(top);
             DISPATCH();
         }
 
-        case TARGET(DUP_TOP_TWO): {
+        case TARGET(DUP_TOP_TWO): {         // 复制栈顶两个元素，并压栈
             PyObject *top = TOP();
             PyObject *second = SECOND();
             Py_INCREF(top);
@@ -1939,7 +1940,7 @@ main_loop:
             DISPATCH();
         }
 
-        case TARGET(UNARY_POSITIVE): {
+        case TARGET(UNARY_POSITIVE): {      // 正号
             PyObject *value = TOP();
             PyObject *res = PyNumber_Positive(value);
             Py_DECREF(value);
@@ -1949,7 +1950,7 @@ main_loop:
             DISPATCH();
         }
 
-        case TARGET(UNARY_NEGATIVE): {
+        case TARGET(UNARY_NEGATIVE): {  // 负号
             PyObject *value = TOP();
             PyObject *res = PyNumber_Negative(value);
             Py_DECREF(value);
@@ -1959,7 +1960,7 @@ main_loop:
             DISPATCH();
         }
 
-        case TARGET(UNARY_NOT): {
+        case TARGET(UNARY_NOT): {           // 逻辑非
             PyObject *value = TOP();
             int err = PyObject_IsTrue(value);
             Py_DECREF(value);
@@ -1977,7 +1978,7 @@ main_loop:
             goto error;
         }
 
-        case TARGET(UNARY_INVERT): {
+        case TARGET(UNARY_INVERT): {        // 按位取反
             PyObject *value = TOP();
             PyObject *res = PyNumber_Invert(value);
             Py_DECREF(value);
@@ -1987,7 +1988,7 @@ main_loop:
             DISPATCH();
         }
 
-        case TARGET(BINARY_POWER): {
+        case TARGET(BINARY_POWER): {    // 幂运算
             PyObject *exp = POP();
             PyObject *base = TOP();
             PyObject *res = PyNumber_Power(base, exp, Py_None);
@@ -1999,7 +2000,7 @@ main_loop:
             DISPATCH();
         }
 
-        case TARGET(BINARY_MULTIPLY): {
+        case TARGET(BINARY_MULTIPLY): {     // 乘法
             PyObject *right = POP();
             PyObject *left = TOP();
             PyObject *res = PyNumber_Multiply(left, right);
@@ -2011,7 +2012,7 @@ main_loop:
             DISPATCH();
         }
 
-        case TARGET(BINARY_MATRIX_MULTIPLY): {
+        case TARGET(BINARY_MATRIX_MULTIPLY): {  // 矩阵乘法 @
             PyObject *right = POP();
             PyObject *left = TOP();
             PyObject *res = PyNumber_MatrixMultiply(left, right);
@@ -2023,7 +2024,7 @@ main_loop:
             DISPATCH();
         }
 
-        case TARGET(BINARY_TRUE_DIVIDE): {
+        case TARGET(BINARY_TRUE_DIVIDE): {      // 真除法
             PyObject *divisor = POP();
             PyObject *dividend = TOP();
             PyObject *quotient = PyNumber_TrueDivide(dividend, divisor);
@@ -2035,7 +2036,7 @@ main_loop:
             DISPATCH();
         }
 
-        case TARGET(BINARY_FLOOR_DIVIDE): {
+        case TARGET(BINARY_FLOOR_DIVIDE): {     // floor除法
             PyObject *divisor = POP();
             PyObject *dividend = TOP();
             PyObject *quotient = PyNumber_FloorDivide(dividend, divisor);
@@ -2047,7 +2048,7 @@ main_loop:
             DISPATCH();
         }
 
-        case TARGET(BINARY_MODULO): {
+        case TARGET(BINARY_MODULO): {       // 取模，或者字符串格式化
             PyObject *divisor = POP();
             PyObject *dividend = TOP();
             PyObject *res;
@@ -2067,7 +2068,7 @@ main_loop:
             DISPATCH();
         }
 
-        case TARGET(BINARY_ADD): {
+        case TARGET(BINARY_ADD): {      // 加法
             PyObject *right = POP();
             PyObject *left = TOP();
             PyObject *sum;
@@ -2093,7 +2094,7 @@ main_loop:
             DISPATCH();
         }
 
-        case TARGET(BINARY_SUBTRACT): {
+        case TARGET(BINARY_SUBTRACT): { // 减法
             PyObject *right = POP();
             PyObject *left = TOP();
             PyObject *diff = PyNumber_Subtract(left, right);
@@ -2105,7 +2106,7 @@ main_loop:
             DISPATCH();
         }
 
-        case TARGET(BINARY_SUBSCR): {
+        case TARGET(BINARY_SUBSCR): {   // 下标取值
             PyObject *sub = POP();
             PyObject *container = TOP();
             PyObject *res = PyObject_GetItem(container, sub);
@@ -2117,7 +2118,7 @@ main_loop:
             DISPATCH();
         }
 
-        case TARGET(BINARY_LSHIFT): {
+        case TARGET(BINARY_LSHIFT): {   // 左移
             PyObject *right = POP();
             PyObject *left = TOP();
             PyObject *res = PyNumber_Lshift(left, right);
@@ -2129,7 +2130,7 @@ main_loop:
             DISPATCH();
         }
 
-        case TARGET(BINARY_RSHIFT): {
+        case TARGET(BINARY_RSHIFT): {   // 右移
             PyObject *right = POP();
             PyObject *left = TOP();
             PyObject *res = PyNumber_Rshift(left, right);
@@ -2141,7 +2142,7 @@ main_loop:
             DISPATCH();
         }
 
-        case TARGET(BINARY_AND): {
+        case TARGET(BINARY_AND): {  // 位与
             PyObject *right = POP();
             PyObject *left = TOP();
             PyObject *res = PyNumber_And(left, right);
@@ -2153,7 +2154,7 @@ main_loop:
             DISPATCH();
         }
 
-        case TARGET(BINARY_XOR): {
+        case TARGET(BINARY_XOR): {  // 位异或
             PyObject *right = POP();
             PyObject *left = TOP();
             PyObject *res = PyNumber_Xor(left, right);
@@ -2165,7 +2166,7 @@ main_loop:
             DISPATCH();
         }
 
-        case TARGET(BINARY_OR): {
+        case TARGET(BINARY_OR): {   // 位或
             PyObject *right = POP();
             PyObject *left = TOP();
             PyObject *res = PyNumber_Or(left, right);
@@ -2177,7 +2178,7 @@ main_loop:
             DISPATCH();
         }
 
-        case TARGET(LIST_APPEND): {
+        case TARGET(LIST_APPEND): {     // 列表追加
             PyObject *v = POP();
             PyObject *list = PEEK(oparg);
             int err;
@@ -2189,7 +2190,7 @@ main_loop:
             DISPATCH();
         }
 
-        case TARGET(SET_ADD): {
+        case TARGET(SET_ADD): { // 集合添加
             PyObject *v = POP();
             PyObject *set = PEEK(oparg);
             int err;
@@ -2201,7 +2202,7 @@ main_loop:
             DISPATCH();
         }
 
-        case TARGET(INPLACE_POWER): {
+        case TARGET(INPLACE_POWER): {       // 幂运算
             PyObject *exp = POP();
             PyObject *base = TOP();
             PyObject *res = PyNumber_InPlacePower(base, exp, Py_None);
@@ -2213,7 +2214,7 @@ main_loop:
             DISPATCH();
         }
 
-        case TARGET(INPLACE_MULTIPLY): {
+        case TARGET(INPLACE_MULTIPLY): {    // 乘法
             PyObject *right = POP();
             PyObject *left = TOP();
             PyObject *res = PyNumber_InPlaceMultiply(left, right);
@@ -2225,7 +2226,7 @@ main_loop:
             DISPATCH();
         }
 
-        case TARGET(INPLACE_MATRIX_MULTIPLY): {
+        case TARGET(INPLACE_MATRIX_MULTIPLY): { // 矩阵乘法
             PyObject *right = POP();
             PyObject *left = TOP();
             PyObject *res = PyNumber_InPlaceMatrixMultiply(left, right);
@@ -2237,7 +2238,7 @@ main_loop:
             DISPATCH();
         }
 
-        case TARGET(INPLACE_TRUE_DIVIDE): {
+        case TARGET(INPLACE_TRUE_DIVIDE): { // 真除法
             PyObject *divisor = POP();
             PyObject *dividend = TOP();
             PyObject *quotient = PyNumber_InPlaceTrueDivide(dividend, divisor);
@@ -2249,7 +2250,7 @@ main_loop:
             DISPATCH();
         }
 
-        case TARGET(INPLACE_FLOOR_DIVIDE): {
+        case TARGET(INPLACE_FLOOR_DIVIDE): {    // 地板除
             PyObject *divisor = POP();
             PyObject *dividend = TOP();
             PyObject *quotient = PyNumber_InPlaceFloorDivide(dividend, divisor);
@@ -2261,7 +2262,7 @@ main_loop:
             DISPATCH();
         }
 
-        case TARGET(INPLACE_MODULO): {
+        case TARGET(INPLACE_MODULO): {  // 取模
             PyObject *right = POP();
             PyObject *left = TOP();
             PyObject *mod = PyNumber_InPlaceRemainder(left, right);
@@ -2273,7 +2274,7 @@ main_loop:
             DISPATCH();
         }
 
-        case TARGET(INPLACE_ADD): {
+        case TARGET(INPLACE_ADD): { // 加法
             PyObject *right = POP();
             PyObject *left = TOP();
             PyObject *sum;
@@ -2292,7 +2293,7 @@ main_loop:
             DISPATCH();
         }
 
-        case TARGET(INPLACE_SUBTRACT): {
+        case TARGET(INPLACE_SUBTRACT): {        // 减法
             PyObject *right = POP();
             PyObject *left = TOP();
             PyObject *diff = PyNumber_InPlaceSubtract(left, right);
@@ -2304,7 +2305,7 @@ main_loop:
             DISPATCH();
         }
 
-        case TARGET(INPLACE_LSHIFT): {
+        case TARGET(INPLACE_LSHIFT): {      // 左移
             PyObject *right = POP();
             PyObject *left = TOP();
             PyObject *res = PyNumber_InPlaceLshift(left, right);
@@ -2316,7 +2317,7 @@ main_loop:
             DISPATCH();
         }
 
-        case TARGET(INPLACE_RSHIFT): {
+        case TARGET(INPLACE_RSHIFT): {      // 右移
             PyObject *right = POP();
             PyObject *left = TOP();
             PyObject *res = PyNumber_InPlaceRshift(left, right);
@@ -2328,7 +2329,7 @@ main_loop:
             DISPATCH();
         }
 
-        case TARGET(INPLACE_AND): {
+        case TARGET(INPLACE_AND): { // 位与
             PyObject *right = POP();
             PyObject *left = TOP();
             PyObject *res = PyNumber_InPlaceAnd(left, right);
@@ -2340,7 +2341,7 @@ main_loop:
             DISPATCH();
         }
 
-        case TARGET(INPLACE_XOR): {
+        case TARGET(INPLACE_XOR): {     // 位异或
             PyObject *right = POP();
             PyObject *left = TOP();
             PyObject *res = PyNumber_InPlaceXor(left, right);
@@ -2352,7 +2353,7 @@ main_loop:
             DISPATCH();
         }
 
-        case TARGET(INPLACE_OR): {
+        case TARGET(INPLACE_OR): {  // 位或
             PyObject *right = POP();
             PyObject *left = TOP();
             PyObject *res = PyNumber_InPlaceOr(left, right);
@@ -2364,7 +2365,7 @@ main_loop:
             DISPATCH();
         }
 
-        case TARGET(STORE_SUBSCR): {
+        case TARGET(STORE_SUBSCR): {            // 存储子
             PyObject *sub = TOP();
             PyObject *container = SECOND();
             PyObject *v = THIRD();
@@ -2380,7 +2381,7 @@ main_loop:
             DISPATCH();
         }
 
-        case TARGET(DELETE_SUBSCR): {
+        case TARGET(DELETE_SUBSCR): {       // 删除子
             PyObject *sub = TOP();
             PyObject *container = SECOND();
             int err;
@@ -2394,7 +2395,7 @@ main_loop:
             DISPATCH();
         }
 
-        case TARGET(PRINT_EXPR): {
+        case TARGET(PRINT_EXPR): {              // 打印表达式
             _Py_IDENTIFIER(displayhook);
             PyObject *value = POP();
             PyObject *hook = _PySys_GetObjectId(&PyId_displayhook);
@@ -2413,7 +2414,7 @@ main_loop:
             DISPATCH();
         }
 
-        case TARGET(RAISE_VARARGS): {
+        case TARGET(RAISE_VARARGS): {           // 抛出异常
             PyObject *cause = NULL, *exc = NULL;
             switch (oparg) {
             case 2:
@@ -2435,17 +2436,17 @@ main_loop:
             goto error;
         }
 
-        case TARGET(RETURN_VALUE): {
-            retval = POP();
+        case TARGET(RETURN_VALUE): {            // 返回值
+            retval = POP();             // 弹出栈顶元素，即返回值
             assert(f->f_iblock == 0);
             assert(EMPTY());
-            f->f_state = FRAME_RETURNED;
-            f->f_stackdepth = 0;
-            goto exiting;
+            f->f_state = FRAME_RETURNED;        // 设置帧状态为返回
+            f->f_stackdepth = 0;                // 栈深度为0
+            goto exiting;                       // 退出
         }
 
-        case TARGET(GET_AITER): {
-            unaryfunc getter = NULL;
+        case TARGET(GET_AITER): {               // 获取迭代器
+            unaryfunc getter = NULL;                // 获取迭代器
             PyObject *iter = NULL;
             PyObject *obj = TOP();
             PyTypeObject *type = Py_TYPE(obj);
@@ -2488,7 +2489,7 @@ main_loop:
             DISPATCH();
         }
 
-        case TARGET(GET_ANEXT): {
+        case TARGET(GET_ANEXT): {               // 获取下一个
             unaryfunc getter = NULL;
             PyObject *next_iter = NULL;
             PyObject *awaitable = NULL;
@@ -2539,7 +2540,7 @@ main_loop:
             DISPATCH();
         }
 
-        case TARGET(GET_AWAITABLE): {
+        case TARGET(GET_AWAITABLE): {           // 获取可等待对象
             PREDICTED(GET_AWAITABLE);
             PyObject *iterable = TOP();
             PyObject *iter = _PyCoro_GetAwaitableIter(iterable);
@@ -2580,7 +2581,7 @@ main_loop:
             DISPATCH();
         }
 
-        case TARGET(YIELD_FROM): {
+        case TARGET(YIELD_FROM): {          // 从生成器中获取值
             PyObject *v = POP();
             PyObject *receiver = TOP();
             PySendResult gen_status;
@@ -2632,7 +2633,7 @@ main_loop:
             goto exiting;
         }
 
-        case TARGET(YIELD_VALUE): {
+        case TARGET(YIELD_VALUE): {         // 生成器返回值
             retval = POP();
 
             if (co->co_flags & CO_ASYNC_GENERATOR) {
@@ -2649,7 +2650,7 @@ main_loop:
             goto exiting;
         }
 
-        case TARGET(GEN_START): {
+        case TARGET(GEN_START): {           // 生成器开始
             PyObject *none = POP();
             assert(none == Py_None);
             assert(oparg < 3);
@@ -2657,7 +2658,7 @@ main_loop:
             DISPATCH();
         }
 
-        case TARGET(POP_EXCEPT): {
+        case TARGET(POP_EXCEPT): {                  // 弹出异常
             PyObject *type, *value, *traceback;
             _PyErr_StackItem *exc_info;
             PyTryBlock *b = PyFrame_BlockPop(f);
@@ -2681,12 +2682,12 @@ main_loop:
             DISPATCH();
         }
 
-        case TARGET(POP_BLOCK): {
+        case TARGET(POP_BLOCK): {       // 弹出块
             PyFrame_BlockPop(f);
             DISPATCH();
         }
 
-        case TARGET(RERAISE): {
+        case TARGET(RERAISE): {         // 重新抛出异常 re raise
             assert(f->f_iblock > 0);
             if (oparg) {
                 f->f_lasti = f->f_blockstack[f->f_iblock-1].b_handler;
@@ -2699,7 +2700,7 @@ main_loop:
             goto exception_unwind;
         }
 
-        case TARGET(END_ASYNC_FOR): {
+        case TARGET(END_ASYNC_FOR): {           // 结束异步for循环
             PyObject *exc = POP();
             assert(PyExceptionClass_Check(exc));
             if (PyErr_GivenExceptionMatches(exc, PyExc_StopAsyncIteration)) {
@@ -2719,14 +2720,14 @@ main_loop:
             }
         }
 
-        case TARGET(LOAD_ASSERTION_ERROR): {
+        case TARGET(LOAD_ASSERTION_ERROR): {        // 加载断言错误
             PyObject *value = PyExc_AssertionError;
             Py_INCREF(value);
             PUSH(value);
             DISPATCH();
         }
 
-        case TARGET(LOAD_BUILD_CLASS): {
+        case TARGET(LOAD_BUILD_CLASS): {        // 加载构建类
             _Py_IDENTIFIER(__build_class__);
 
             PyObject *bc;
@@ -2757,7 +2758,7 @@ main_loop:
             DISPATCH();
         }
 
-        case TARGET(STORE_NAME): {
+        case TARGET(STORE_NAME): {              // 存储名称
             PyObject *name = GETITEM(names, oparg);
             PyObject *v = POP();
             PyObject *ns = f->f_locals;
@@ -2778,7 +2779,7 @@ main_loop:
             DISPATCH();
         }
 
-        case TARGET(DELETE_NAME): {
+        case TARGET(DELETE_NAME): {             // 删除名称
             PyObject *name = GETITEM(names, oparg);
             PyObject *ns = f->f_locals;
             int err;
@@ -2797,7 +2798,7 @@ main_loop:
             DISPATCH();
         }
 
-        case TARGET(UNPACK_SEQUENCE): {
+        case TARGET(UNPACK_SEQUENCE): {         // 解包序列
             PREDICTED(UNPACK_SEQUENCE);
             PyObject *seq = POP(), *item, **items;
             if (PyTuple_CheckExact(seq) &&
@@ -2828,7 +2829,7 @@ main_loop:
             DISPATCH();
         }
 
-        case TARGET(UNPACK_EX): {
+        case TARGET(UNPACK_EX): {               // 解包扩展
             int totalargs = 1 + (oparg & 0xFF) + (oparg >> 8);
             PyObject *seq = POP();
 
@@ -2843,7 +2844,7 @@ main_loop:
             DISPATCH();
         }
 
-        case TARGET(STORE_ATTR): {
+        case TARGET(STORE_ATTR): {          // 存储属性
             PyObject *name = GETITEM(names, oparg);
             PyObject *owner = TOP();
             PyObject *v = SECOND();
@@ -2857,32 +2858,32 @@ main_loop:
             DISPATCH();
         }
 
-        case TARGET(DELETE_ATTR): {
-            PyObject *name = GETITEM(names, oparg);
-            PyObject *owner = POP();
+        case TARGET(DELETE_ATTR): {         // 删除属性
+            PyObject *name = GETITEM(names, oparg); // name
+            PyObject *owner = POP();        // owner
             int err;
-            err = PyObject_SetAttr(owner, name, (PyObject *)NULL);
+            err = PyObject_SetAttr(owner, name, (PyObject *)NULL);      // owner.name = NULL
             Py_DECREF(owner);
             if (err != 0)
                 goto error;
             DISPATCH();
         }
 
-        case TARGET(STORE_GLOBAL): {
+        case TARGET(STORE_GLOBAL): {            // 存储全局
             PyObject *name = GETITEM(names, oparg);
             PyObject *v = POP();
             int err;
-            err = PyDict_SetItem(f->f_globals, name, v);
+            err = PyDict_SetItem(f->f_globals, name, v);    // f->f_globals[name] = v
             Py_DECREF(v);
             if (err != 0)
                 goto error;
             DISPATCH();
         }
 
-        case TARGET(DELETE_GLOBAL): {
+        case TARGET(DELETE_GLOBAL): {               // 删除全局
             PyObject *name = GETITEM(names, oparg);
             int err;
-            err = PyDict_DelItem(f->f_globals, name);
+            err = PyDict_DelItem(f->f_globals, name);       // del f->f_globals[name]
             if (err != 0) {
                 if (_PyErr_ExceptionMatches(tstate, PyExc_KeyError)) {
                     format_exc_check_arg(tstate, PyExc_NameError,
@@ -2893,7 +2894,7 @@ main_loop:
             DISPATCH();
         }
 
-        case TARGET(LOAD_NAME): {
+        case TARGET(LOAD_NAME): {                       // 加载名称
             PyObject *name = GETITEM(names, oparg);
             PyObject *locals = f->f_locals;
             PyObject *v;
@@ -2957,7 +2958,7 @@ main_loop:
             DISPATCH();
         }
 
-        case TARGET(LOAD_GLOBAL): {
+        case TARGET(LOAD_GLOBAL): {         // 加载全局
             PyObject *name;
             PyObject *v;
             if (PyDict_CheckExact(f->f_globals)
@@ -3043,7 +3044,7 @@ main_loop:
             DISPATCH();
         }
 
-        case TARGET(DELETE_FAST): {
+        case TARGET(DELETE_FAST): {             // 删除快速 local?
             PyObject *v = GETLOCAL(oparg);
             if (v != NULL) {
                 SETLOCAL(oparg, NULL);
@@ -3057,7 +3058,7 @@ main_loop:
             goto error;
         }
 
-        case TARGET(DELETE_DEREF): {
+        case TARGET(DELETE_DEREF): {                    // 删除闭包
             PyObject *cell = freevars[oparg];
             PyObject *oldobj = PyCell_GET(cell);
             if (oldobj != NULL) {
@@ -3069,14 +3070,14 @@ main_loop:
             goto error;
         }
 
-        case TARGET(LOAD_CLOSURE): {
+        case TARGET(LOAD_CLOSURE): {            // 加载闭包 
             PyObject *cell = freevars[oparg];
             Py_INCREF(cell);
             PUSH(cell);
             DISPATCH();
         }
 
-        case TARGET(LOAD_CLASSDEREF): {
+        case TARGET(LOAD_CLASSDEREF): {         // 加载类闭包
             PyObject *name, *value, *locals = f->f_locals;
             Py_ssize_t idx;
             assert(locals);
@@ -3115,7 +3116,7 @@ main_loop:
             DISPATCH();
         }
 
-        case TARGET(LOAD_DEREF): {
+        case TARGET(LOAD_DEREF): {          // 加载闭包
             PyObject *cell = freevars[oparg];
             PyObject *value = PyCell_GET(cell);
             if (value == NULL) {
@@ -3127,8 +3128,8 @@ main_loop:
             DISPATCH();
         }
 
-        case TARGET(STORE_DEREF): {
-            PyObject *v = POP();
+        case TARGET(STORE_DEREF): {         // 存储闭包
+            PyObject *v = POP();       
             PyObject *cell = freevars[oparg];
             PyObject *oldobj = PyCell_GET(cell);
             PyCell_SET(cell, v);
@@ -3136,7 +3137,7 @@ main_loop:
             DISPATCH();
         }
 
-        case TARGET(BUILD_STRING): {
+        case TARGET(BUILD_STRING): {        // 构建字符串
             PyObject *str;
             PyObject *empty = PyUnicode_New(0, 0);
             if (empty == NULL) {
@@ -3154,42 +3155,43 @@ main_loop:
             DISPATCH();
         }
 
-        case TARGET(BUILD_TUPLE): {
+        case TARGET(BUILD_TUPLE): {     // 构建元组
+            // 构建元组
             PyObject *tup = PyTuple_New(oparg);
             if (tup == NULL)
                 goto error;
             while (--oparg >= 0) {
-                PyObject *item = POP();
-                PyTuple_SET_ITEM(tup, oparg, item);
+                PyObject *item = POP();             // 从栈中弹出元素
+                PyTuple_SET_ITEM(tup, oparg, item); // 将元素放入元组
             }
-            PUSH(tup);
-            DISPATCH();
+            PUSH(tup);  // 将元组放入栈中
+            DISPATCH(); // 跳转到下一条指令
         }
 
         case TARGET(BUILD_LIST): {
-            PyObject *list =  PyList_New(oparg);
+            PyObject *list =  PyList_New(oparg);    // 构建列表
             if (list == NULL)
                 goto error;
             while (--oparg >= 0) {
                 PyObject *item = POP();
-                PyList_SET_ITEM(list, oparg, item);
+                PyList_SET_ITEM(list, oparg, item); // 将元素放入列表
             }
             PUSH(list);
             DISPATCH();
         }
 
-        case TARGET(LIST_TO_TUPLE): {
-            PyObject *list = POP();
-            PyObject *tuple = PyList_AsTuple(list);
+        case TARGET(LIST_TO_TUPLE): {               // 将列表转换为元组
+            PyObject *list = POP();                 // 弹出列表
+            PyObject *tuple = PyList_AsTuple(list); // 将列表转换为元组
             Py_DECREF(list);
             if (tuple == NULL) {
                 goto error;
             }
-            PUSH(tuple);
+            PUSH(tuple);            // 将元组放入栈中
             DISPATCH();
         }
 
-        case TARGET(LIST_EXTEND): {
+        case TARGET(LIST_EXTEND): {                 // 列表扩展, extend?
             PyObject *iterable = POP();
             PyObject *list = PEEK(oparg);
             PyObject *none_val = _PyList_Extend((PyListObject *)list, iterable);
@@ -3221,16 +3223,16 @@ main_loop:
             DISPATCH();
         }
 
-        case TARGET(BUILD_SET): {
-            PyObject *set = PySet_New(NULL);
+        case TARGET(BUILD_SET): {                   // 构建集合
+            PyObject *set = PySet_New(NULL);        // 创建集合
             int err = 0;
             int i;
             if (set == NULL)
                 goto error;
-            for (i = oparg; i > 0; i--) {
+            for (i = oparg; i > 0; i--) {           // 将栈中的元素放入集合
                 PyObject *item = PEEK(i);
                 if (err == 0)
-                    err = PySet_Add(set, item);
+                    err = PySet_Add(set, item);     // 将元素放入集合
                 Py_DECREF(item);
             }
             STACK_SHRINK(oparg);
@@ -3244,14 +3246,14 @@ main_loop:
 
         case TARGET(BUILD_MAP): {
             Py_ssize_t i;
-            PyObject *map = _PyDict_NewPresized((Py_ssize_t)oparg);
+            PyObject *map = _PyDict_NewPresized((Py_ssize_t)oparg); // 创建字典
             if (map == NULL)
                 goto error;
             for (i = oparg; i > 0; i--) {
                 int err;
-                PyObject *key = PEEK(2*i);
-                PyObject *value = PEEK(2*i - 1);
-                err = PyDict_SetItem(map, key, value);
+                PyObject *key = PEEK(2*i);          // 从栈中弹出键
+                PyObject *value = PEEK(2*i - 1);    // 从栈中弹出值
+                err = PyDict_SetItem(map, key, value);      // 将键值对放入字典
                 if (err != 0) {
                     Py_DECREF(map);
                     goto error;
@@ -3262,11 +3264,11 @@ main_loop:
                 Py_DECREF(POP());
                 Py_DECREF(POP());
             }
-            PUSH(map);
+            PUSH(map);                  // 将字典放入栈中
             DISPATCH();
         }
 
-        case TARGET(SETUP_ANNOTATIONS): {
+        case TARGET(SETUP_ANNOTATIONS): {               // 设置注解
             _Py_IDENTIFIER(__annotations__);
             int err;
             PyObject *ann_dict;
@@ -3325,7 +3327,7 @@ main_loop:
             DISPATCH();
         }
 
-        case TARGET(BUILD_CONST_KEY_MAP): {
+        case TARGET(BUILD_CONST_KEY_MAP): {     // 构建常量键映射
             Py_ssize_t i;
             PyObject *map;
             PyObject *keys = TOP();
@@ -3358,9 +3360,9 @@ main_loop:
             DISPATCH();
         }
 
-        case TARGET(DICT_UPDATE): {
-            PyObject *update = POP();
-            PyObject *dict = PEEK(oparg);
+        case TARGET(DICT_UPDATE): {         // 字典更新
+            PyObject *update = POP();       // 弹出更新的字典
+            PyObject *dict = PEEK(oparg);   // 弹出被更新的字典
             if (PyDict_Update(dict, update) < 0) {
                 if (_PyErr_ExceptionMatches(tstate, PyExc_AttributeError)) {
                     _PyErr_Format(tstate, PyExc_TypeError,
@@ -3388,7 +3390,7 @@ main_loop:
             DISPATCH();
         }
 
-        case TARGET(MAP_ADD): {
+        case TARGET(MAP_ADD): {     // map[key] = value
             PyObject *value = TOP();
             PyObject *key = SECOND();
             PyObject *map;
@@ -3405,7 +3407,7 @@ main_loop:
             DISPATCH();
         }
 
-        case TARGET(LOAD_ATTR): {
+        case TARGET(LOAD_ATTR): {       // 加载属性
             PyObject *name = GETITEM(names, oparg);
             PyObject *owner = TOP();
 
@@ -3599,7 +3601,7 @@ main_loop:
             DISPATCH();
         }
 
-        case TARGET(COMPARE_OP): {
+        case TARGET(COMPARE_OP): {      // compare two values
             assert(oparg <= Py_GE);
             PyObject *right = POP();
             PyObject *left = TOP();
@@ -3614,7 +3616,7 @@ main_loop:
             DISPATCH();
         }
 
-        case TARGET(IS_OP): {
+        case TARGET(IS_OP): {           // check object identity
             PyObject *right = POP();
             PyObject *left = TOP();
             int res = Py_Is(left, right) ^ oparg;
@@ -3628,7 +3630,7 @@ main_loop:
             DISPATCH();
         }
 
-        case TARGET(CONTAINS_OP): {
+        case TARGET(CONTAINS_OP): {     // check membership
             PyObject *right = POP();
             PyObject *left = POP();
             int res = PySequence_Contains(right, left);
@@ -3648,7 +3650,7 @@ main_loop:
 #define CANNOT_CATCH_MSG "catching classes that do not inherit from "\
                          "BaseException is not allowed"
 
-        case TARGET(JUMP_IF_NOT_EXC_MATCH): {
+        case TARGET(JUMP_IF_NOT_EXC_MATCH): {       // catch exception
             PyObject *right = POP();
             PyObject *left = POP();
             if (PyTuple_Check(right)) {
@@ -3689,7 +3691,7 @@ main_loop:
             DISPATCH();
         }
 
-        case TARGET(IMPORT_NAME): {
+        case TARGET(IMPORT_NAME): {             // import a name
             PyObject *name = GETITEM(names, oparg);
             PyObject *fromlist = POP();
             PyObject *level = TOP();
@@ -3703,7 +3705,7 @@ main_loop:
             DISPATCH();
         }
 
-        case TARGET(IMPORT_STAR): {
+        case TARGET(IMPORT_STAR): {         // import all names except a given list
             PyObject *from = POP(), *locals;
             int err;
             if (PyFrame_FastToLocalsWithError(f) < 0) {
@@ -3726,7 +3728,7 @@ main_loop:
             DISPATCH();
         }
 
-        case TARGET(IMPORT_FROM): {
+        case TARGET(IMPORT_FROM): {                 // import a name from a module
             PyObject *name = GETITEM(names, oparg);
             PyObject *from = TOP();
             PyObject *res;
@@ -3737,12 +3739,12 @@ main_loop:
             DISPATCH();
         }
 
-        case TARGET(JUMP_FORWARD): {
+        case TARGET(JUMP_FORWARD): {            // jump ahead
             JUMPBY(oparg);
             DISPATCH();
         }
 
-        case TARGET(POP_JUMP_IF_FALSE): {
+        case TARGET(POP_JUMP_IF_FALSE): {       // pop TOS and jump if false
             PREDICTED(POP_JUMP_IF_FALSE);
             PyObject *cond = POP();
             int err;
@@ -3769,7 +3771,7 @@ main_loop:
             DISPATCH();
         }
 
-        case TARGET(POP_JUMP_IF_TRUE): {
+        case TARGET(POP_JUMP_IF_TRUE): {        // pop TOS and jump if true
             PREDICTED(POP_JUMP_IF_TRUE);
             PyObject *cond = POP();
             int err;
@@ -3796,7 +3798,7 @@ main_loop:
             DISPATCH();
         }
 
-        case TARGET(JUMP_IF_FALSE_OR_POP): {
+        case TARGET(JUMP_IF_FALSE_OR_POP): {        // jump if false or pop TOS
             PyObject *cond = TOP();
             int err;
             if (Py_IsTrue(cond)) {
@@ -3820,7 +3822,7 @@ main_loop:
             DISPATCH();
         }
 
-        case TARGET(JUMP_IF_TRUE_OR_POP): {
+        case TARGET(JUMP_IF_TRUE_OR_POP): {     // jump if true or pop TOS
             PyObject *cond = TOP();
             int err;
             if (Py_IsFalse(cond)) {
@@ -3845,14 +3847,14 @@ main_loop:
             DISPATCH();
         }
 
-        case TARGET(JUMP_ABSOLUTE): {
+        case TARGET(JUMP_ABSOLUTE): {       // jump to absolute position
             PREDICTED(JUMP_ABSOLUTE);
             JUMPTO(oparg);
             CHECK_EVAL_BREAKER();
             DISPATCH();
         }
 
-        case TARGET(GET_LEN): {
+        case TARGET(GET_LEN): {     // call __len__
             // PUSH(len(TOS))
             Py_ssize_t len_i = PyObject_Length(TOP());
             if (len_i < 0) {
@@ -3866,7 +3868,7 @@ main_loop:
             DISPATCH();
         }
 
-        case TARGET(MATCH_CLASS): {
+        case TARGET(MATCH_CLASS): {             // match class
             // Pop TOS. On success, set TOS to True and TOS1 to a tuple of
             // attributes. On failure, set TOS to False.
             PyObject *names = POP();
@@ -3889,7 +3891,7 @@ main_loop:
             DISPATCH();
         }
 
-        case TARGET(MATCH_MAPPING): {
+        case TARGET(MATCH_MAPPING): {           // match mapping
             PyObject *subject = TOP();
             int match = Py_TYPE(subject)->tp_flags & Py_TPFLAGS_MAPPING;
             PyObject *res = match ? Py_True : Py_False;
@@ -3898,7 +3900,7 @@ main_loop:
             DISPATCH();
         }
 
-        case TARGET(MATCH_SEQUENCE): {
+        case TARGET(MATCH_SEQUENCE): {      // match sequence
             PyObject *subject = TOP();
             int match = Py_TYPE(subject)->tp_flags & Py_TPFLAGS_SEQUENCE;
             PyObject *res = match ? Py_True : Py_False;
@@ -3907,7 +3909,7 @@ main_loop:
             DISPATCH();
         }
 
-        case TARGET(MATCH_KEYS): {
+        case TARGET(MATCH_KEYS): {      // 匹配keys
             // On successful match for all keys, PUSH(values) and PUSH(True).
             // Otherwise, PUSH(None) and PUSH(False).
             PyObject *keys = TOP();
@@ -3928,7 +3930,7 @@ main_loop:
             DISPATCH();
         }
 
-        case TARGET(COPY_DICT_WITHOUT_KEYS): {
+        case TARGET(COPY_DICT_WITHOUT_KEYS): {  // copy dict without keys
             // rest = dict(TOS1)
             // for key in TOS:
             //     del rest[key]
@@ -3954,7 +3956,7 @@ main_loop:
             DISPATCH();
         }
 
-        case TARGET(GET_ITER): {
+        case TARGET(GET_ITER): {            // get iterator
             /* before: [obj]; after [getiter(obj)] */
             PyObject *iterable = TOP();
             PyObject *iter = PyObject_GetIter(iterable);
@@ -3967,7 +3969,7 @@ main_loop:
             DISPATCH();
         }
 
-        case TARGET(GET_YIELD_FROM_ITER): {
+        case TARGET(GET_YIELD_FROM_ITER): {         // get yield from iterator
             /* before: [obj]; after [getiter(obj)] */
             PyObject *iterable = TOP();
             PyObject *iter;
@@ -3996,7 +3998,7 @@ main_loop:
             DISPATCH();
         }
 
-        case TARGET(FOR_ITER): {
+        case TARGET(FOR_ITER): {            // for iterator
             PREDICTED(FOR_ITER);
             /* before: [iter]; after: [iter, iter()] *or* [] */
             PyObject *iter = TOP();
@@ -4023,13 +4025,13 @@ main_loop:
             DISPATCH();
         }
 
-        case TARGET(SETUP_FINALLY): {
+        case TARGET(SETUP_FINALLY): {           // setup finally
             PyFrame_BlockSetup(f, SETUP_FINALLY, INSTR_OFFSET() + oparg,
                                STACK_LEVEL());
             DISPATCH();
         }
 
-        case TARGET(BEFORE_ASYNC_WITH): {
+        case TARGET(BEFORE_ASYNC_WITH): {       // before async with
             _Py_IDENTIFIER(__aenter__);
             _Py_IDENTIFIER(__aexit__);
             PyObject *mgr = TOP();
@@ -4054,7 +4056,7 @@ main_loop:
             DISPATCH();
         }
 
-        case TARGET(SETUP_ASYNC_WITH): {
+        case TARGET(SETUP_ASYNC_WITH): {        // setup async with
             PyObject *res = POP();
             /* Setup the finally block before pushing the result
                of __aenter__ on the stack. */
@@ -4064,7 +4066,7 @@ main_loop:
             DISPATCH();
         }
 
-        case TARGET(SETUP_WITH): {
+        case TARGET(SETUP_WITH): {      // setup with
             _Py_IDENTIFIER(__enter__);
             _Py_IDENTIFIER(__exit__);
             PyObject *mgr = TOP();
@@ -4093,7 +4095,7 @@ main_loop:
             DISPATCH();
         }
 
-        case TARGET(WITH_EXCEPT_START): {
+        case TARGET(WITH_EXCEPT_START): {           // with except start
             /* At the top of the stack are 7 values:
                - (TOP, SECOND, THIRD) = exc_info()
                - (FOURTH, FIFTH, SIXTH) = previous exception for EXCEPT_HANDLER
@@ -4121,7 +4123,7 @@ main_loop:
             DISPATCH();
         }
 
-        case TARGET(LOAD_METHOD): {
+        case TARGET(LOAD_METHOD): {         // load method
             /* Designed to work in tandem with CALL_METHOD. */
             PyObject *name = GETITEM(names, oparg);
             PyObject *obj = TOP();
@@ -4158,7 +4160,7 @@ main_loop:
             DISPATCH();
         }
 
-        case TARGET(CALL_METHOD): {
+        case TARGET(CALL_METHOD): {         // call method
             /* Designed to work in tamdem with LOAD_METHOD. */
             PyObject **sp, *res, *meth;
 
@@ -4208,7 +4210,7 @@ main_loop:
             DISPATCH();
         }
 
-        case TARGET(CALL_FUNCTION): {
+        case TARGET(CALL_FUNCTION): {           // call function
             PREDICTED(CALL_FUNCTION);
             PyObject **sp, *res;
             sp = stack_pointer;
@@ -4222,7 +4224,7 @@ main_loop:
             DISPATCH();
         }
 
-        case TARGET(CALL_FUNCTION_KW): {
+        case TARGET(CALL_FUNCTION_KW): {        // call function kw
             PyObject **sp, *res, *names;
 
             names = POP();
@@ -4242,7 +4244,7 @@ main_loop:
             DISPATCH();
         }
 
-        case TARGET(CALL_FUNCTION_EX): {
+        case TARGET(CALL_FUNCTION_EX): {         // call function ex
             PREDICTED(CALL_FUNCTION_EX);
             PyObject *func, *callargs, *kwargs = NULL, *result;
             if (oparg & 0x01) {
@@ -4289,7 +4291,7 @@ main_loop:
             DISPATCH();
         }
 
-        case TARGET(MAKE_FUNCTION): {
+        case TARGET(MAKE_FUNCTION): {       // make function
             PyObject *qualname = POP();
             PyObject *codeobj = POP();
             PyFunctionObject *func = (PyFunctionObject *)
@@ -4318,11 +4320,11 @@ main_loop:
                 func->func_defaults = POP();
             }
 
-            PUSH((PyObject *)func);
+            PUSH((PyObject *)func);     // push function
             DISPATCH();
         }
 
-        case TARGET(BUILD_SLICE): {
+        case TARGET(BUILD_SLICE): {     // build slice
             PyObject *start, *stop, *step, *slice;
             if (oparg == 3)
                 step = POP();
@@ -4340,7 +4342,7 @@ main_loop:
             DISPATCH();
         }
 
-        case TARGET(FORMAT_VALUE): {
+        case TARGET(FORMAT_VALUE): {            // format value
             /* Handles f-string value formatting. */
             PyObject *result;
             PyObject *fmt_spec;
@@ -4400,7 +4402,7 @@ main_loop:
             DISPATCH();
         }
 
-        case TARGET(ROT_N): {
+        case TARGET(ROT_N): {           // rotate n
             PyObject *top = TOP();
             memmove(&PEEK(oparg - 1), &PEEK(oparg),
                     sizeof(PyObject*) * (oparg - 1));
@@ -4408,7 +4410,7 @@ main_loop:
             DISPATCH();
         }
 
-        case TARGET(EXTENDED_ARG): {
+        case TARGET(EXTENDED_ARG): {            // extended arg
             int oldoparg = oparg;
             NEXTOPARG();
             oparg |= oldoparg << 8;
@@ -4540,17 +4542,17 @@ exiting:
     }
 
     /* pop frame */
-exit_eval_frame:
-    /* Restore previous cframe */
+exit_eval_frame:            // 退出eval_frame
+    /* Restore previous cframe */       // 恢复上一帧
     tstate->cframe = trace_info.cframe.previous;
     tstate->cframe->use_tracing = trace_info.cframe.use_tracing;
 
-    if (PyDTrace_FUNCTION_RETURN_ENABLED())
-        dtrace_function_return(f);
-    _Py_LeaveRecursiveCall(tstate);
-    tstate->frame = f->f_back;
+    if (PyDTrace_FUNCTION_RETURN_ENABLED())     // DTrace
+        dtrace_function_return(f);             
+    _Py_LeaveRecursiveCall(tstate);     // 递归调用计数减一
+    tstate->frame = f->f_back;      // 恢复上一帧
 
-    return _Py_CheckFunctionResult(tstate, NULL, retval, __func__);
+    return _Py_CheckFunctionResult(tstate, NULL, retval, __func__); // 返回值
 }
 
 static void

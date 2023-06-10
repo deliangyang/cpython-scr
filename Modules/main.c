@@ -313,7 +313,7 @@ pymain_run_file_obj(PyObject *program_name, PyObject *filename,
     if (PySys_Audit("cpython.run_file", "O", filename) < 0) {
         return pymain_exit_err_print();
     }
-
+    // 读取文件
     FILE *fp = _Py_fopen_obj(filename, "rb");
     if (fp == NULL) {
         // Ignore the OSError
