@@ -232,7 +232,7 @@ PyInterpreterState_New(void)
     PyConfig_InitPythonConfig(&interp->config);
     _PyType_InitCache(interp);
 
-    interp->eval_frame = _PyEval_EvalFrameDefault;
+    interp->eval_frame = _PyEval_EvalFrameDefault;      // 设置default frame evaluator
 #ifdef HAVE_DLOPEN
 #if HAVE_DECL_RTLD_NOW
     interp->dlopenflags = RTLD_NOW;

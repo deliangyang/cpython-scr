@@ -20,34 +20,34 @@ enum _framestate {
 typedef signed char PyFrameState;
 
 typedef struct {
-    int b_type;                 /* what kind of block this is */
-    int b_handler;              /* where to jump to find handler */
-    int b_level;                /* value stack level to pop to */
+    int b_type;                 /* what kind of block this is */    // 块的类型
+    int b_handler;              /* where to jump to find handler */ // 跳转到哪里找到处理程序
+    int b_level;                /* value stack level to pop to */   // 弹出值栈的级别
 } PyTryBlock;
 
 // 栈帧
 struct _frame {
     PyObject_VAR_HEAD
     struct _frame *f_back;      /* previous frame, or NULL 前一个栈帧 */
-    PyCodeObject *f_code;       /* code segment */
+    PyCodeObject *f_code;       /* code segment */      // 代码段
     PyObject *f_builtins;       /* builtin symbol table (PyDictObject) 内置符号表，字典 */
     PyObject *f_globals;        /* global symbol table (PyDictObject) 全局符号表 字典 */
     PyObject *f_locals;         /* local symbol table (any mapping)  当前作用域 映射 */
-    PyObject **f_valuestack;    /* points after the last local */
-    PyObject *f_trace;          /* Trace function */
-    int f_stackdepth;           /* Depth of value stack */
-    char f_trace_lines;         /* Emit per-line trace events? */
-    char f_trace_opcodes;       /* Emit per-opcode trace events? */
+    PyObject **f_valuestack;    /* points after the last local */   // 指向最后一个局部变量的后面
+    PyObject *f_trace;          /* Trace function */    // 跟踪函数
+    int f_stackdepth;           /* Depth of value stack */  // 值栈深度
+    char f_trace_lines;         /* Emit per-line trace events? */ // 每行跟踪事件
+    char f_trace_opcodes;       /* Emit per-opcode trace events? */ // 每个操作码跟踪事件
 
     /* Borrowed reference to a generator, or NULL */
-    PyObject *f_gen;
+    PyObject *f_gen;        // 生成器
 
-    int f_lasti;                /* Last instruction if called */
-    int f_lineno;               /* Current line number. Only valid if non-zero */
-    int f_iblock;               /* index in f_blockstack */
-    PyFrameState f_state;       /* What state the frame is in 状态 */
-    PyTryBlock f_blockstack[CO_MAXBLOCKS]; /* for try and loop blocks  */
-    PyObject *f_localsplus[1];  /* locals+stack, dynamically sized */
+    int f_lasti;                /* Last instruction if called */    // 最后一条指令
+    int f_lineno;               /* Current line number. Only valid if non-zero */   // 当前行号
+    int f_iblock;               /* index in f_blockstack */ // f_blockstack的索引
+    PyFrameState f_state;       /* What state the frame is in 状态 */   // 栈帧的状态
+    PyTryBlock f_blockstack[CO_MAXBLOCKS]; /* for try and loop blocks  */   // try 和 loop 块，长度为CO_MAXBLOCKS=20
+    PyObject *f_localsplus[1];  /* locals+stack, dynamically sized */   // 局部变量和栈，长度为1
 };
 
 // 状态判断
@@ -69,6 +69,7 @@ PyAPI_DATA(PyTypeObject) PyFrame_Type;
 
 #define PyFrame_Check(op) Py_IS_TYPE(op, &PyFrame_Type)
 
+// 创建栈帧
 PyAPI_FUNC(PyFrameObject *) PyFrame_New(PyThreadState *, PyCodeObject *,
                                         PyObject *, PyObject *);
 

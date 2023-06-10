@@ -1140,10 +1140,11 @@ PyEval_EvalCode(PyObject *co, PyObject *globals, PyObject *locals)
 /* Interpreter main loop */
 
 PyObject *
-PyEval_EvalFrame(PyFrameObject *f)
+PyEval_EvalFrame(PyFrameObject *f)          // 该函数是真正的执行函数
 {
     /* Function kept for backward compatibility */
-    PyThreadState *tstate = _PyThreadState_GET();
+    PyThreadState *tstate = _PyThreadState_GET();    // 获取当前线程状态      
+    // tstate->interp->eval_frame = _PyEval_EvalFrameDefault(tstate, f, 0);
     return _PyEval_EvalFrame(tstate, f, 0);
 }
 
@@ -4457,7 +4458,7 @@ error:
                            tstate, f, &trace_info);
         }
 exception_unwind:
-        f->f_state = FRAME_UNWINDING;
+        f->f_state = FRAME_UNWINDING;       // mark frame as unwinding
         /* Unwind stacks if an exception occurred */
         while (f->f_iblock > 0) {
             /* Pop the current block. */
