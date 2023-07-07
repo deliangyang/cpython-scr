@@ -25,7 +25,7 @@
 
 /* Alternative SOABI used in debug build to load C extensions built in release
    mode */
-/* #undef ALT_SOABI */
+#define ALT_SOABI "cpython-310-x86_64-linux-gnu"
 
 /* The Android API level. */
 /* #undef ANDROID_API_LEVEL */
@@ -83,7 +83,7 @@
 #define HAVE_ASINH 1
 
 /* Define to 1 if you have the <asm/types.h> header file. */
-/* #undef HAVE_ASM_TYPES_H */
+#define HAVE_ASM_TYPES_H 1
 
 /* Define to 1 if you have the `atanh' function. */
 #define HAVE_ATANH 1
@@ -165,7 +165,7 @@
 #define HAVE_COPY_FILE_RANGE 1
 
 /* Define to 1 if you have the <crypt.h> header file. */
-/* #undef HAVE_CRYPT_H */
+#define HAVE_CRYPT_H 1
 
 /* Define if you have the crypt_r() function. */
 #define HAVE_CRYPT_R 1
@@ -283,7 +283,7 @@
 #define HAVE_DIRFD 1
 
 /* Define to 1 if you have the <dlfcn.h> header file. */
-/* #undef HAVE_DLFCN_H */
+#define HAVE_DLFCN_H 1
 
 /* Define to 1 if you have the `dlopen' function. */
 #define HAVE_DLOPEN 1
@@ -316,7 +316,7 @@
 #define HAVE_ERFC 1
 
 /* Define to 1 if you have the <errno.h> header file. */
-/* #undef HAVE_ERRNO_H */
+#define HAVE_ERRNO_H 1
 
 /* Define if you have the 'eventfd' function. */
 #define HAVE_EVENTFD 1
@@ -352,7 +352,7 @@
 #define HAVE_FCHOWNAT 1
 
 /* Define to 1 if you have the <fcntl.h> header file. */
-/* #undef HAVE_FCNTL_H */
+#define HAVE_FCNTL_H 1
 
 /* Define if you have the 'fdatasync' function. */
 #define HAVE_FDATASYNC 1
@@ -540,7 +540,7 @@
 /* #undef HAVE_GLIBC_MEMMOVE_BUG */
 
 /* Define to 1 if you have the <grp.h> header file. */
-/* #undef HAVE_GRP_H */
+#define HAVE_GRP_H 1
 
 /* Define if you have the 'hstrerror' function. */
 #define HAVE_HSTRERROR 1
@@ -567,7 +567,7 @@
 #define HAVE_INITGROUPS 1
 
 /* Define to 1 if you have the <inttypes.h> header file. */
-/* #undef HAVE_INTTYPES_H */
+#define HAVE_INTTYPES_H 1
 
 /* Define to 1 if you have the <io.h> header file. */
 /* #undef HAVE_IO_H */
@@ -585,7 +585,7 @@
 /* #undef HAVE_KQUEUE */
 
 /* Define to 1 if you have the <langinfo.h> header file. */
-/* #undef HAVE_LANGINFO_H */
+#define HAVE_LANGINFO_H 1
 
 /* Defined to enable large file support when an off_t is bigger than a long
    and long long is at least as big as an off_t. You may need to add some
@@ -615,7 +615,7 @@
 /* #undef HAVE_LIBIEEE */
 
 /* Define to 1 if you have the <libintl.h> header file. */
-/* #undef HAVE_LIBINTL_H */
+#define HAVE_LIBINTL_H 1
 
 /* Define to build the readline module. */
 #define HAVE_LIBREADLINE 1
@@ -708,10 +708,10 @@
 #define HAVE_MBRTOWC 1
 
 /* Define if you have the 'memfd_create' function. */
-/* #undef HAVE_MEMFD_CREATE */
+#define HAVE_MEMFD_CREATE 1
 
 /* Define to 1 if you have the <memory.h> header file. */
-/* #undef HAVE_MEMORY_H */
+#define HAVE_MEMORY_H 1
 
 /* Define to 1 if you have the `memrchr' function. */
 #define HAVE_MEMRCHR 1
@@ -781,7 +781,7 @@
 #define HAVE_POLL 1
 
 /* Define to 1 if you have the <poll.h> header file. */
-/* #undef HAVE_POLL_H */
+#define HAVE_POLL_H 1
 
 /* Define to 1 if you have the `posix_fadvise' function. */
 #define HAVE_POSIX_FADVISE 1
@@ -805,7 +805,7 @@
 #define HAVE_PREADV2 1
 
 /* Define if you have the 'prlimit' functions. */
-/* #undef HAVE_PRLIMIT */
+#define HAVE_PRLIMIT 1
 
 /* Define to 1 if you have the <process.h> header file. */
 /* #undef HAVE_PROCESS_H */
@@ -823,7 +823,7 @@
 #define HAVE_PTHREAD_GETCPUCLOCKID 1
 
 /* Define to 1 if you have the <pthread.h> header file. */
-/* #undef HAVE_PTHREAD_H */
+#define HAVE_PTHREAD_H 1
 
 /* Define to 1 if you have the `pthread_init' function. */
 /* #undef HAVE_PTHREAD_INIT */
@@ -895,7 +895,7 @@
 #define HAVE_SCHED_GET_PRIORITY_MAX 1
 
 /* Define to 1 if you have the <sched.h> header file. */
-/* #undef HAVE_SCHED_H */
+#define HAVE_SCHED_H 1
 
 /* Define to 1 if you have the `sched_rr_get_interval' function. */
 #define HAVE_SCHED_RR_GET_INTERVAL 1
@@ -937,7 +937,7 @@
 #define HAVE_SETGID 1
 
 /* Define if you have the 'setgroups' function. */
-/* #undef HAVE_SETGROUPS */
+#define HAVE_SETGROUPS 1
 
 /* Define to 1 if you have the `sethostname' function. */
 #define HAVE_SETHOSTNAME 1
@@ -979,7 +979,7 @@
 #define HAVE_SETVBUF 1
 
 /* Define to 1 if you have the <shadow.h> header file. */
-/* #undef HAVE_SHADOW_H */
+#define HAVE_SHADOW_H 1
 
 /* Define to 1 if you have the `shm_open' function. */
 #define HAVE_SHM_OPEN 1
@@ -1003,7 +1003,7 @@
 #define HAVE_SIGINTERRUPT 1
 
 /* Define to 1 if you have the <signal.h> header file. */
-/* #undef HAVE_SIGNAL_H */
+#define HAVE_SIGNAL_H 1
 
 /* Define to 1 if you have the `sigpending' function. */
 #define HAVE_SIGPENDING 1
@@ -1058,10 +1058,10 @@
 #define HAVE_STDARG_PROTOTYPES 1
 
 /* Define to 1 if you have the <stdint.h> header file. */
-/* #undef HAVE_STDINT_H */
+#define HAVE_STDINT_H 1
 
 /* Define to 1 if you have the <stdlib.h> header file. */
-/* #undef HAVE_STDLIB_H */
+#define HAVE_STDLIB_H 1
 
 /* Has stdatomic.h with atomic_int and atomic_uintptr_t */
 #define HAVE_STD_ATOMIC 1
@@ -1070,10 +1070,10 @@
 #define HAVE_STRFTIME 1
 
 /* Define to 1 if you have the <strings.h> header file. */
-/* #undef HAVE_STRINGS_H */
+#define HAVE_STRINGS_H 1
 
 /* Define to 1 if you have the <string.h> header file. */
-/* #undef HAVE_STRING_H */
+#define HAVE_STRING_H 1
 
 /* Define to 1 if you have the `strlcpy' function. */
 /* #undef HAVE_STRLCPY */
@@ -1146,7 +1146,7 @@
 /* #undef HAVE_SYS_ENDIAN_H */
 
 /* Define to 1 if you have the <sys/epoll.h> header file. */
-/* #undef HAVE_SYS_EPOLL_H */
+#define HAVE_SYS_EPOLL_H 1
 
 /* Define to 1 if you have the <sys/eventfd.h> header file. */
 #define HAVE_SYS_EVENTFD_H 1
@@ -1155,10 +1155,10 @@
 /* #undef HAVE_SYS_EVENT_H */
 
 /* Define to 1 if you have the <sys/file.h> header file. */
-/* #undef HAVE_SYS_FILE_H */
+#define HAVE_SYS_FILE_H 1
 
 /* Define to 1 if you have the <sys/ioctl.h> header file. */
-/* #undef HAVE_SYS_IOCTL_H */
+#define HAVE_SYS_IOCTL_H 1
 
 /* Define to 1 if you have the <sys/kern_control.h> header file. */
 /* #undef HAVE_SYS_KERN_CONTROL_H */
@@ -1189,7 +1189,7 @@
 #define HAVE_SYS_PARAM_H 1
 
 /* Define to 1 if you have the <sys/poll.h> header file. */
-/* #undef HAVE_SYS_POLL_H */
+#define HAVE_SYS_POLL_H 1
 
 /* Define to 1 if you have the <sys/random.h> header file. */
 #define HAVE_SYS_RANDOM_H 1
@@ -1246,7 +1246,7 @@
 #define HAVE_SYS_WAIT_H 1
 
 /* Define to 1 if you have the <sys/xattr.h> header file. */
-/* #undef HAVE_SYS_XATTR_H */
+#define HAVE_SYS_XATTR_H 1
 
 /* Define to 1 if you have the `tcgetpgrp' function. */
 #define HAVE_TCGETPGRP 1
@@ -1258,7 +1258,7 @@
 #define HAVE_TEMPNAM 1
 
 /* Define to 1 if you have the <termios.h> header file. */
-/* #undef HAVE_TERMIOS_H */
+#define HAVE_TERMIOS_H 1
 
 /* Define to 1 if you have the <term.h> header file. */
 #define HAVE_TERM_H 1
@@ -1299,7 +1299,7 @@
 #define HAVE_UNAME 1
 
 /* Define to 1 if you have the <unistd.h> header file. */
-/* #undef HAVE_UNISTD_H */
+#define HAVE_UNISTD_H 1
 
 /* Define to 1 if you have the `unlinkat' function. */
 #define HAVE_UNLINKAT 1
@@ -1319,7 +1319,7 @@
 #define HAVE_UTIMES 1
 
 /* Define to 1 if you have the <utime.h> header file. */
-/* #undef HAVE_UTIME_H */
+#define HAVE_UTIME_H 1
 
 /* Define if uuid_create() exists. */
 /* #undef HAVE_UUID_CREATE */
@@ -1437,7 +1437,7 @@
 /* #undef PY_SSL_DEFAULT_CIPHER_STRING */
 
 /* Define if you want to build an interpreter with many run-time checks. */
-/* #undef Py_DEBUG */
+#define Py_DEBUG 1
 
 /* Defined if Python is built as a shared library. */
 /* #undef Py_ENABLE_SHARED */
@@ -1492,7 +1492,7 @@
 #define SIZEOF_PTHREAD_KEY_T 4
 
 /* The size of `pthread_t', as computed by sizeof. */
-#define SIZEOF_PTHREAD_T 0
+#define SIZEOF_PTHREAD_T 8
 
 /* The size of `short', as computed by sizeof. */
 #define SIZEOF_SHORT 2
@@ -1504,7 +1504,7 @@
 #define SIZEOF_TIME_T 8
 
 /* The size of `uintptr_t', as computed by sizeof. */
-#define SIZEOF_UINTPTR_T 0
+#define SIZEOF_UINTPTR_T 8
 
 /* The size of `void *', as computed by sizeof. */
 #define SIZEOF_VOID_P 8
@@ -1516,7 +1516,7 @@
 #define SIZEOF__BOOL 1
 
 /* Define to 1 if you have the ANSI C header files. */
-/* #undef STDC_HEADERS */
+#define STDC_HEADERS 1
 
 /* Define if you can safely include both <sys/select.h> and <sys/time.h>
    (which you can't on SCO ODT 3.0). */
@@ -1539,23 +1539,23 @@
 
 /* Enable extensions on AIX 3, Interix.  */
 #ifndef _ALL_SOURCE
-/* # undef _ALL_SOURCE */
+# define _ALL_SOURCE 1
 #endif
 /* Enable GNU extensions on systems that have them.  */
 #ifndef _GNU_SOURCE
-/* # undef _GNU_SOURCE */
+# define _GNU_SOURCE 1
 #endif
 /* Enable threading extensions on Solaris.  */
 #ifndef _POSIX_PTHREAD_SEMANTICS
-/* # undef _POSIX_PTHREAD_SEMANTICS */
+# define _POSIX_PTHREAD_SEMANTICS 1
 #endif
 /* Enable extensions on HP NonStop.  */
 #ifndef _TANDEM_SOURCE
-/* # undef _TANDEM_SOURCE */
+# define _TANDEM_SOURCE 1
 #endif
 /* Enable general extensions on Solaris.  */
 #ifndef __EXTENSIONS__
-/* # undef __EXTENSIONS__ */
+# define __EXTENSIONS__ 1
 #endif
 
 
@@ -1612,13 +1612,13 @@
 /* #undef _BSD_SOURCE */
 
 /* Define on Darwin to activate all library features */
-/* #undef _DARWIN_C_SOURCE */
+#define _DARWIN_C_SOURCE 1
 
 /* This must be set to 64 on some systems to enable large file support. */
 #define _FILE_OFFSET_BITS 64
 
 /* Define on Linux to activate all library features */
-/* #undef _GNU_SOURCE */
+#define _GNU_SOURCE 1
 
 /* Define to include mbstate_t for mbrtowc */
 /* #undef _INCLUDE__STDC_A1_SOURCE */
@@ -1633,14 +1633,14 @@
 /* #undef _MINIX */
 
 /* Define on NetBSD to activate all library features */
-/* #undef _NETBSD_SOURCE */
+#define _NETBSD_SOURCE 1
 
 /* Define to 2 if the system does not provide POSIX.1 features except with
    this defined. */
 /* #undef _POSIX_1_SOURCE */
 
 /* Define to activate features from IEEE Stds 1003.1-2008 */
-/* #undef _POSIX_C_SOURCE */
+#define _POSIX_C_SOURCE 200809L
 
 /* Define to 1 if you need to in order for `stat' and other things to work. */
 /* #undef _POSIX_SOURCE */
@@ -1649,19 +1649,19 @@
 /* #undef _POSIX_THREADS */
 
 /* framework name */
-/* #undef _PYTHONFRAMEWORK */
+#define _PYTHONFRAMEWORK ""
 
 /* Define to force use of thread-safe errno, h_errno, and other functions */
 #define _REENTRANT 1
 
 /* Define to the level of X/Open that your system supports */
-/* #undef _XOPEN_SOURCE */
+#define _XOPEN_SOURCE 700
 
 /* Define to activate Unix95-and-earlier features */
-/* #undef _XOPEN_SOURCE_EXTENDED */
+#define _XOPEN_SOURCE_EXTENDED 1
 
 /* Define on FreeBSD to activate all library features */
-/* #undef __BSD_VISIBLE */
+#define __BSD_VISIBLE 1
 
 /* Define to 'long' if <time.h> doesn't define. */
 /* #undef clock_t */

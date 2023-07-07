@@ -43,6 +43,10 @@ extern PyObject *_PyEval_BuiltinsFromGlobals(
 static inline PyObject*
 _PyEval_EvalFrame(PyThreadState *tstate, PyFrameObject *f, int throwflag)
 {
+    // 通过 interp->eval_frame 来执行 frame
+    // tstate 是当前线程的状态
+    // f 是要执行的 frame
+    // throwflag 是是否抛出异常
     return tstate->interp->eval_frame(tstate, f, throwflag);
 }
 

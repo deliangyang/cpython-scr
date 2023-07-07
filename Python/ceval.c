@@ -1133,6 +1133,7 @@ PyEval_EvalCode(PyObject *co, PyObject *globals, PyObject *locals)
         .fc_kwdefaults = NULL,
         .fc_closure = NULL
     };
+    // 执行
     return _PyEval_Vector(tstate, &desc, locals, NULL, 0, NULL);
 }
 
@@ -1669,7 +1670,7 @@ _PyEval_EvalFrameDefault(PyThreadState *tstate, PyFrameObject *f, int throwflag)
 
     names = co->co_names;
     consts = co->co_consts;
-    fastlocals = f->f_localsplus;
+    fastlocals = f->f_localsplus;   
     freevars = f->f_localsplus + co->co_nlocals;
     assert(PyBytes_Check(co->co_code));
     assert(PyBytes_GET_SIZE(co->co_code) <= INT_MAX);
@@ -1693,7 +1694,7 @@ _PyEval_EvalFrameDefault(PyThreadState *tstate, PyFrameObject *f, int throwflag)
     */
     assert(f->f_lasti >= -1);
     next_instr = first_instr + f->f_lasti + 1;
-    stack_pointer = f->f_valuestack + f->f_stackdepth;
+    stack_pointer = f->f_valuestack + f->f_stackdepth;  // 栈顶指针，数据栈的指针 + 栈深度，
     /* Set f->f_stackdepth to -1.
      * Update when returning or calling trace function.
        Having f_stackdepth <= 0 ensures that invalid
@@ -4778,7 +4779,7 @@ fail:
 
 }
 
-
+// 生成一个新的frame向量
 PyFrameObject *
 _PyEval_MakeFrameVector(PyThreadState *tstate,
            PyFrameConstructor *con, PyObject *locals,
@@ -5036,7 +5037,7 @@ make_coro(PyFrameConstructor *con, PyFrameObject *f)
     Py_CLEAR(f->f_back);
 
     /* Create a new generator that owns the ready to run frame
-        * and return that as the value. */
+        * and return that as the value. */  // 创建一个新的生成器，该生成器拥有准备运行的帧并将其作为值返回。
     if (is_coro) {
             gen = PyCoro_New(f, con->fc_name, con->fc_qualname);
     } else if (((PyCodeObject *)con->fc_code)->co_flags & CO_ASYNC_GENERATOR) {
@@ -5067,6 +5068,7 @@ _PyEval_Vector(PyThreadState *tstate, PyFrameConstructor *con,
     }
     // 迭代器、routine、异步迭代器
     if (((PyCodeObject *)con->fc_code)->co_flags & (CO_GENERATOR | CO_COROUTINE | CO_ASYNC_GENERATOR)) {
+        // 生成器
         return make_coro(con, f);
     }
     // 执行栈帧，获取返回值
@@ -5076,15 +5078,15 @@ _PyEval_Vector(PyThreadState *tstate, PyFrameConstructor *con,
        which can call back into Python.  While we're done with the
        current Python frame (f), the associated C stack is still in use,
        so recursion_depth must be boosted for the duration.
-    */
+    */  // 减少帧的引用计数可能会导致调用__del__方法，这可能会回调到Python。虽然我们已经完成了当前的Python帧(f)，但相关的C堆栈仍在使用中，因此递归深度必须在此期间提高。
     if (Py_REFCNT(f) > 1) {
         Py_DECREF(f);
         _PyObject_GC_TRACK(f);
     }
     else {
-        ++tstate->recursion_depth;
-        Py_DECREF(f);
-        --tstate->recursion_depth;
+        ++tstate->recursion_depth;  // 递归深度
+        Py_DECREF(f);           // 减少帧的引用计数
+        --tstate->recursion_depth;  // 递归深度
     }
     return retval;
 }

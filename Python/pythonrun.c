@@ -500,10 +500,11 @@ int
 PyRun_SimpleStringFlags(const char *command, PyCompilerFlags *flags)
 {
     PyObject *m, *d, *v;
-    m = PyImport_AddModule("__main__");
+    m = PyImport_AddModule("__main__"); // 添加 __main__
     if (m == NULL)
         return -1;
-    d = PyModule_GetDict(m);
+    d = PyModule_GetDict(m);    // 获取 __main__ 的 dict
+    // 执行py，Tokenizer，Parser，ast，opcode vm
     v = PyRun_StringFlags(command, Py_file_input, d, d, flags);
     if (v == NULL) {
         PyErr_Print();
@@ -1176,15 +1177,17 @@ PyRun_StringFlags(const char *str, int start, PyObject *globals,
     filename = _PyUnicode_FromId(&PyId_string); /* borrowed */
     if (filename == NULL)
         return NULL;
-
+    // 内存分配？
     arena = _PyArena_New();
     if (arena == NULL)
         return NULL;
-
+    // 构建语法树？
     mod = _PyParser_ASTFromString(str, filename, start, flags, arena);
 
     if (mod != NULL)
+        // 执行模块
         ret = run_mod(mod, filename, globals, locals, flags, arena);
+    // 释放内存
     _PyArena_Free(arena);
     return ret;
 }
@@ -1285,6 +1288,7 @@ run_eval_code_obj(PyThreadState *tstate, PyCodeObject *co, PyObject *globals, Py
     _Py_UnhandledKeyboardInterrupt = 0;
 
     /* Set globals['__builtins__'] if it doesn't exist */
+    // 如果globals中没有__builtins__，则设置
     if (globals != NULL && _PyDict_GetItemStringWithError(globals, "__builtins__") == NULL) {
         if (PyErr_Occurred() ||
             PyDict_SetItemString(globals, "__builtins__",
@@ -1305,7 +1309,7 @@ static PyObject *
 run_mod(mod_ty mod, PyObject *filename, PyObject *globals, PyObject *locals,
             PyCompilerFlags *flags, PyArena *arena)
 {
-    PyThreadState *tstate = _PyThreadState_GET();
+    PyThreadState *tstate = _PyThreadState_GET();   // 获得线程状态
     // 获得ast opcode？
     PyCodeObject *co = _PyAST_Compile(mod, filename, flags, -1, arena);
     if (co == NULL)

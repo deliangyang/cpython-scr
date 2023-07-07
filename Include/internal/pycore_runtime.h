@@ -24,7 +24,7 @@ struct _ceval_runtime_state {
 #endif
 };
 
-/* GIL state */
+/* GIL state */ // 全局解释器锁状态
 
 struct _gilstate_runtime_state {
     /* bpo-26558: Flag to disable PyGILState_Check().

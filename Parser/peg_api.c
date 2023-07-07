@@ -3,6 +3,7 @@
 #include "tokenizer.h"
 #include "pegen.h"
 
+// 从字符串中解析出 AST
 mod_ty
 _PyParser_ASTFromString(const char *str, PyObject* filename, int mode,
                         PyCompilerFlags *flags, PyArena *arena)
@@ -15,6 +16,7 @@ _PyParser_ASTFromString(const char *str, PyObject* filename, int mode,
     return result;
 }
 
+// 从文件中解析出 AST
 mod_ty
 _PyParser_ASTFromFile(FILE *fp, PyObject *filename_ob, const char *enc,
                       int mode, const char *ps1, const char* ps2,

@@ -47,7 +47,7 @@ struct _frame {
     int f_iblock;               /* index in f_blockstack */ // f_blockstack的索引
     PyFrameState f_state;       /* What state the frame is in 状态 */   // 栈帧的状态
     PyTryBlock f_blockstack[CO_MAXBLOCKS]; /* for try and loop blocks  */   // try 和 loop 块，长度为CO_MAXBLOCKS=20
-    PyObject *f_localsplus[1];  /* locals+stack, dynamically sized */   // 局部变量和栈，长度为1
+    PyObject *f_localsplus[1];  /* locals+stack, dynamically sized */   // 局部变量和栈，动态地长度
 };
 
 // 状态判断

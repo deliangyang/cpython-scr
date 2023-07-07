@@ -2,50 +2,50 @@
 #  error "this header file must not be included directly"
 #endif
 
-typedef uint16_t _Py_CODEUNIT;
+typedef uint16_t _Py_CODEUNIT;      // unsigned short int
 
 #ifdef WORDS_BIGENDIAN
 #  define _Py_OPCODE(word) ((word) >> 8)
 #  define _Py_OPARG(word) ((word) & 255)
 #else
-#  define _Py_OPCODE(word) ((word) & 255)
-#  define _Py_OPARG(word) ((word) >> 8)
+#  define _Py_OPCODE(word) ((word) & 255)   // 操作码
+#  define _Py_OPARG(word) ((word) >> 8)     // 操作数
 #endif
 
-typedef struct _PyOpcache _PyOpcache;
+typedef struct _PyOpcache _PyOpcache;     // 操作码缓存
 
 /* Bytecode object */
 struct PyCodeObject {
     PyObject_HEAD
-    int co_argcount;            /* #arguments, except *args */
-    int co_posonlyargcount;     /* #positional only arguments */
-    int co_kwonlyargcount;      /* #keyword only arguments */
-    int co_nlocals;             /* #local variables */
-    int co_stacksize;           /* #entries needed for evaluation stack */
-    int co_flags;               /* CO_..., see below */
-    int co_firstlineno;         /* first source line number */
-    PyObject *co_code;          /* instruction opcodes */
-    PyObject *co_consts;        /* list (constants used) */
-    PyObject *co_names;         /* list of strings (names used) */
-    PyObject *co_varnames;      /* tuple of strings (local variable names) */
-    PyObject *co_freevars;      /* tuple of strings (free variable names) */
-    PyObject *co_cellvars;      /* tuple of strings (cell variable names) */
+    int co_argcount;            /* #arguments, except *args */ // 参数个数
+    int co_posonlyargcount;     /* #positional only arguments */  // 位置参数个数
+    int co_kwonlyargcount;      /* #keyword only arguments */  // 关键字参数个数
+    int co_nlocals;             /* #local variables */   // 局部变量个数
+    int co_stacksize;           /* #entries needed for evaluation stack */ // 栈大小
+    int co_flags;               /* CO_..., see below */  // 标志位
+    int co_firstlineno;         /* first source line number */    // 第一行行号
+    PyObject *co_code;          /* instruction opcodes */   // 操作码
+    PyObject *co_consts;        /* list (constants used) */ // 常量
+    PyObject *co_names;         /* list of strings (names used) */   // 名称
+    PyObject *co_varnames;      /* tuple of strings (local variable names) */ // 局部变量名
+    PyObject *co_freevars;      /* tuple of strings (free variable names) */  // 自由变量名
+    PyObject *co_cellvars;      /* tuple of strings (cell variable names) */  // 单元变量名
     /* The rest aren't used in either hash or comparisons, except for co_name,
        used in both. This is done to preserve the name and line number
        for tracebacks and debuggers; otherwise, constant de-duplication
        would collapse identical functions/lambdas defined on different lines.
     */
-    Py_ssize_t *co_cell2arg;    /* Maps cell vars which are arguments. */
-    PyObject *co_filename;      /* unicode (where it was loaded from) */
-    PyObject *co_name;          /* unicode (name, for reference) */
-    PyObject *co_linetable;     /* string (encoding addr<->lineno mapping) See
+    Py_ssize_t *co_cell2arg;    /* Maps cell vars which are arguments. */  // 单元变量映射到参数
+    PyObject *co_filename;      /* unicode (where it was loaded from) */   // 文件名
+    PyObject *co_name;          /* unicode (name, for reference) */  // 名称
+    PyObject *co_linetable;     /* string (encoding addr<->lineno mapping) See   // 行号表
                                    Objects/lnotab_notes.txt for details. */
-    void *co_zombieframe;       /* for optimization only (see frameobject.c) */
-    PyObject *co_weakreflist;   /* to support weakrefs to code objects */
+    void *co_zombieframe;       /* for optimization only (see frameobject.c) */  // 优化
+    PyObject *co_weakreflist;   /* to support weakrefs to code objects */     // 弱引用列表
     /* Scratch space for extra data relating to the code object.
        Type is a void* to keep the format private in codeobject.c to force
        people to go through the proper APIs. */
-    void *co_extra;
+    void *co_extra;        // 额外数据
 
     /* Per opcodes just-in-time cache
      *
@@ -57,19 +57,19 @@ struct PyCodeObject {
     // co_opcache_map is indexed by (next_instr - first_instr).
     //  * 0 means there is no cache for this opcode.
     //  * n > 0 means there is cache in co_opcache[n-1].
-    unsigned char *co_opcache_map;
-    _PyOpcache *co_opcache;
-    int co_opcache_flag;  // used to determine when create a cache.
-    unsigned char co_opcache_size;  // length of co_opcache.
+    unsigned char *co_opcache_map;  // 操作码缓存映射
+    _PyOpcache *co_opcache;      // 操作码缓存
+    int co_opcache_flag;  // used to determine when create a cache.  // 用于确定何时创建缓存
+    unsigned char co_opcache_size;  // length of co_opcache.      // 缓存长度
 };
 
-/* Masks for co_flags above */
-#define CO_OPTIMIZED    0x0001
-#define CO_NEWLOCALS    0x0002
-#define CO_VARARGS      0x0004
-#define CO_VARKEYWORDS  0x0008
-#define CO_NESTED       0x0010
-#define CO_GENERATOR    0x0020
+/* Masks for co_flags above */      // 标志位
+#define CO_OPTIMIZED    0x0001      // 优化
+#define CO_NEWLOCALS    0x0002      // 新的局部变量
+#define CO_VARARGS      0x0004      // 可变参数
+#define CO_VARKEYWORDS  0x0008      // 可变关键字参数
+#define CO_NESTED       0x0010      // 嵌套
+#define CO_GENERATOR    0x0020      // 
 /* The CO_NOFREE flag is set if there are no free or cell variables.
    This information is redundant, but it allows a single flag test
    to determine whether there is any extra work to be done when the

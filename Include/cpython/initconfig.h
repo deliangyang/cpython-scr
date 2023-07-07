@@ -12,10 +12,10 @@ typedef struct {
         _PyStatus_TYPE_OK=0,
         _PyStatus_TYPE_ERROR=1,
         _PyStatus_TYPE_EXIT=2
-    } _type;
-    const char *func;
-    const char *err_msg;
-    int exitcode;
+    } _type;                // 类型
+    const char *func;       // 函数名
+    const char *err_msg;    // 错误信息
+    int exitcode;           // 退出码
 } PyStatus;
 
 PyAPI_FUNC(PyStatus) PyStatus_Ok(void);

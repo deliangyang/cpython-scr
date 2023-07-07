@@ -888,8 +888,7 @@ PyFrame_New(PyThreadState *tstate, PyCodeObject *code,
 }
 
 
-/* Block management */
-
+/* Block management */ // 块管理
 void
 PyFrame_BlockSetup(PyFrameObject *f, int type, int handler, int level)
 {
@@ -897,13 +896,13 @@ PyFrame_BlockSetup(PyFrameObject *f, int type, int handler, int level)
     if (f->f_iblock >= CO_MAXBLOCKS) {
         Py_FatalError("block stack overflow");
     }
-    b = &f->f_blockstack[f->f_iblock++];
+    b = &f->f_blockstack[f->f_iblock++];    // 
     b->b_type = type;
     b->b_level = level;
     b->b_handler = handler;
 }
 
-PyTryBlock *
+PyTryBlock *        // 返回一个指向PyTryBlock的指针
 PyFrame_BlockPop(PyFrameObject *f)
 {
     PyTryBlock *b;

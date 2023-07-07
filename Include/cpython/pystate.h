@@ -57,18 +57,18 @@ typedef struct _err_stackitem {
 
 
 // The PyThreadState typedef is in Include/pystate.h.
-struct _ts {
+struct _ts {        // thread state, 双向链表
     /* See Python/ceval.c for comments explaining most fields */
 
-    struct _ts *prev;
-    struct _ts *next;
-    PyInterpreterState *interp;
+    struct _ts *prev;       // Previous thread state, or NULL
+    struct _ts *next;       // 下一个线程的状态
+    PyInterpreterState *interp;     // 解释器状态
 
     /* Borrowed reference to the current frame (it can be NULL) */
-    PyFrameObject *frame;
-    int recursion_depth;
+    PyFrameObject *frame;   // 当前帧
+    int recursion_depth;        // 递归深度
     int recursion_headroom; /* Allow 50 more calls to handle any errors. */
-    int stackcheck_counter;
+    int stackcheck_counter; // 栈检查计数器
 
     /* 'tracing' keeps track of the execution depth when tracing/profiling.
        This is to prevent the actual trace/profile code from being recorded in

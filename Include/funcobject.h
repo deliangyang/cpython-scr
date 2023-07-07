@@ -35,13 +35,13 @@ typedef struct {
 
 typedef struct {
     PyObject_HEAD
-    COMMON_FIELDS(func_)
-    PyObject *func_doc;         /* The __doc__ attribute, can be anything */
-    PyObject *func_dict;        /* The __dict__ attribute, a dict or NULL */
-    PyObject *func_weakreflist; /* List of weak references */
-    PyObject *func_module;      /* The __module__ attribute, can be anything */
-    PyObject *func_annotations; /* Annotations, a dict or NULL */
-    vectorcallfunc vectorcall;
+    COMMON_FIELDS(func_)         // func_globals, func_code, etc.
+    PyObject *func_doc;         /* The __doc__ attribute, can be anything */    // 函数的文档字符串
+    PyObject *func_dict;        /* The __dict__ attribute, a dict or NULL */    // 函数的属性字典
+    PyObject *func_weakreflist; /* List of weak references */           // 弱引用列表
+    PyObject *func_module;      /* The __module__ attribute, can be anything */         // 函数所属的模块
+    PyObject *func_annotations; /* Annotations, a dict or NULL */       // 函数的注解
+    vectorcallfunc vectorcall;  // 函数调用的向量化函数
 
     /* Invariant:
      *     func_closure contains the bindings for func_code->co_freevars, so

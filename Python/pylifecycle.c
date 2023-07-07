@@ -826,7 +826,7 @@ pycore_interp_init(PyThreadState *tstate)
         goto done;
     }
 
-    status = pycore_init_builtins(tstate);
+    status = pycore_init_builtins(tstate);      // 初始化，内置
     if (_PyStatus_EXCEPTION(status)) {
         goto done;
     }
@@ -1939,17 +1939,17 @@ new_interpreter(PyThreadState **tstate_p, int isolated_subinterpreter)
     }
     interp->config._isolated_interpreter = isolated_subinterpreter;
 
-    status = init_interp_create_gil(tstate);
+    status = init_interp_create_gil(tstate);    // 创建GIL
     if (_PyStatus_EXCEPTION(status)) {
         goto error;
     }
 
-    status = pycore_interp_init(tstate);
+    status = pycore_interp_init(tstate);    // 初始化解释器
     if (_PyStatus_EXCEPTION(status)) {
         goto error;
     }
 
-    status = init_interp_main(tstate);
+    status = init_interp_main(tstate);      // 初始化主线程
     if (_PyStatus_EXCEPTION(status)) {
         goto error;
     }

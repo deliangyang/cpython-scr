@@ -20,7 +20,7 @@ instrsize(unsigned int oparg)
 }
 
 /* Spits out op/oparg pair using ilen bytes. codestr should be pointed at the
-   desired location of the first EXTENDED_ARG */
+   desired location of the first EXTENDED_ARG */    // 通过 ilen 字节写入 op/oparg 对，codestr 应指向第一个 EXTENDED_ARG 的位置
 static void
 write_op_arg(_Py_CODEUNIT *codestr, unsigned char opcode,
     unsigned int oparg, int ilen)

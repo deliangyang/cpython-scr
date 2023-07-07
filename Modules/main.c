@@ -227,16 +227,16 @@ pymain_run_command(wchar_t *command)
 {
     PyObject *unicode, *bytes;
     int ret;
-
+    // 转换为unicode
     unicode = PyUnicode_FromWideChar(command, -1);
     if (unicode == NULL) {
         goto error;
     }
-
+    // 安全检查
     if (PySys_Audit("cpython.run_command", "O", unicode) < 0) {
         return pymain_exit_err_print();
     }
-
+    // 转换为bytes
     bytes = PyUnicode_AsUTF8String(unicode);
     Py_DECREF(unicode);
     if (bytes == NULL) {
@@ -245,6 +245,7 @@ pymain_run_command(wchar_t *command)
 
     PyCompilerFlags cf = _PyCompilerFlags_INIT;
     cf.cf_flags |= PyCF_IGNORE_COOKIE;
+    // 执行
     ret = PyRun_SimpleStringFlags(PyBytes_AsString(bytes), &cf);
     Py_DECREF(bytes);
     return (ret != 0);
@@ -535,7 +536,7 @@ pymain_run_python(int *exitcode)
 {
     // 获取解释器状态
     PyInterpreterState *interp = _PyInterpreterState_GET();
-    /* pymain_run_stdin() modify the config */
+    /* pymain_run_stdin() modify the config */ // 获取配置
     PyConfig *config = (PyConfig*)_PyInterpreterState_GetConfig(interp);
 
     // import package
@@ -546,6 +547,7 @@ pymain_run_python(int *exitcode)
            prepended to sys.path.
 
            Otherwise, main_importer_path is left unchanged. */
+           // 获取导入器路径
         if (pymain_get_importer(config->run_filename, &main_importer_path,
                                 exitcode)) {
             return;
@@ -553,11 +555,13 @@ pymain_run_python(int *exitcode)
     }
 
     if (main_importer_path != NULL) {
+        // 如果导入路径不为空，添加到sys.path
         if (pymain_sys_path_add_path0(interp, main_importer_path) < 0) {
             goto error;
         }
     }
     else if (!config->isolated) {
+        // 如果不是隔离模式，添加当前目录到sys.path
         PyObject *path0 = NULL;
         int res = _PyPathConfig_ComputeSysPath0(&config->argv, &path0);
         if (res < 0) {
@@ -576,7 +580,7 @@ pymain_run_python(int *exitcode)
     pymain_header(config);
     pymain_import_readline(config);
 
-    if (config->run_command) {  // 命令执行
+    if (config->run_command) {  // 命令执行 python -c ?
         *exitcode = pymain_run_command(config->run_command);
     }
     else if (config->run_module) { // python -m ?
@@ -672,7 +676,7 @@ Py_RunMain(void)
            other special meaning */
         exitcode = 120;
     }
-
+    // 释放内存
     pymain_free();
 
     if (_Py_UnhandledKeyboardInterrupt) {   // 键盘退出 control + c

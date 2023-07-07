@@ -1,5 +1,6 @@
 /*
  * Memoryview object implementation
+ * 内存视图对象的实现
  * --------------------------------
  *
  *   This implementation is a complete rewrite contributed by Stefan Krah in
@@ -7,7 +8,7 @@
  *   fortified and rewritten the previous implementation) and Nick Coghlan
  *   (who came up with the idea of the ManagedBuffer) for analyzing the complex
  *   ownership rules.
- *
+ * 
  */
 
 #include "Python.h"

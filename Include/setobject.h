@@ -42,21 +42,21 @@ Invariants for frozensets:
 typedef struct {
     PyObject_HEAD
 
-    Py_ssize_t fill;            /* Number active and dummy entries*/
-    Py_ssize_t used;            /* Number active entries */
+    Py_ssize_t fill;            /* Number active and dummy entries*/ // 有效的和虚拟的条目数
+    Py_ssize_t used;            /* Number active entries */ // 有效的条目数
 
     /* The table contains mask + 1 slots, and that's a power of 2.
      * We store the mask instead of the size because the mask is more
      * frequently needed.
      */
-    Py_ssize_t mask;
+    Py_ssize_t mask;    // 2的幂次方 - 1
 
     /* The table points to a fixed-size smalltable for small tables
      * or to additional malloc'ed memory for bigger tables.
      * The table pointer is never NULL which saves us from repeated
      * runtime null-tests.
      */
-    setentry *table;
+    setentry *table;    // 指向固定大小的smalltable或者指向额外的malloc内存
     Py_hash_t hash;             /* Only used by frozenset objects */
     Py_ssize_t finger;          /* Search finger for pop() */
 

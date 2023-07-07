@@ -2,6 +2,8 @@
 
    Python Codec Registry and support functions
 
+   Python编解码器注册表和支持功能
+
 Written by Marc-Andre Lemburg (mal@lemburg.com).
 
 Copyright (c) Corporation for National Research Initiatives.

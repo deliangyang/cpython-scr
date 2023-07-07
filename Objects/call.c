@@ -333,7 +333,9 @@ _PyFunction_Vectorcall(PyObject *func, PyObject* const* stack,
                        size_t nargsf, PyObject *kwnames)
 {
     assert(PyFunction_Check(func));
+    // 获取函数的frame
     PyFrameConstructor *f = PyFunction_AS_FRAME_CONSTRUCTOR(func);
+    // 获取参数个数
     Py_ssize_t nargs = PyVectorcall_NARGS(nargsf);
     assert(nargs >= 0);
     PyThreadState *tstate = _PyThreadState_GET();

@@ -279,7 +279,7 @@ out_of_memory:
         _PyErr_NoMemory(tstate);
     }
 
-    PyMem_RawFree(interp);
+    PyMem_RawFree(interp);  // 释放内存
     return NULL;
 }
 
@@ -361,7 +361,7 @@ _PyInterpreterState_Clear(PyThreadState *tstate)
     interpreter_clear(tstate->interp, tstate);
 }
 
-
+// 释放所有线程 斩首？
 static void
 zapthreads(PyInterpreterState *interp, int check_current)
 {
@@ -547,7 +547,7 @@ _PyInterpreterState_IDIncref(PyInterpreterState *interp)
     }
 
     PyThread_acquire_lock(interp->id_mutex, WAIT_LOCK);
-    interp->id_refcount += 1;
+    interp->id_refcount += 1;    
     PyThread_release_lock(interp->id_mutex);
     return 0;
 }

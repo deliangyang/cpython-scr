@@ -1,24 +1,27 @@
 /*
  * This file compiles an abstract syntax tree (AST) into Python bytecode.
+ * 这个文件将抽象语法树（AST）编译成Python字节码。
  *
  * The primary entry point is _PyAST_Compile(), which returns a
  * PyCodeObject.  The compiler makes several passes to build the code
  * object:
- *   1. Checks for future statements.  See future.c
- *   2. Builds a symbol table.  See symtable.c.
- *   3. Generate code for basic blocks.  See compiler_mod() in this file.
- *   4. Assemble the basic blocks into final code.  See assemble() in
+ *   1. Checks for future statements.  See future.c     检查未来语句，见future.c
+ *   2. Builds a symbol table.  See symtable.c.         构建符号表，见symtable.c
+ *   3. Generate code for basic blocks.  See compiler_mod() in this file.   为基本块生成代码，见本文件中的compiler_mod（）。
+ *   4. Assemble the basic blocks into final code.  See assemble() in   将基本块组装成最终代码，见assemble（）
  *      this file.
- *   5. Optimize the byte code (peephole optimizations).
+ *   5. Optimize the byte code (peephole optimizations).          优化字节码（窥孔优化）。
  *
  * Note that compiler_mod() suggests module, but the module ast type
  * (mod_ty) has cases for expressions and interactive statements.
+ * 注意，compiler_mod（）建议模块，但模块ast类型（mod_ty）有表达式和交互式语句的情况。
  *
  * CAUTION: The VISIT_* macros abort the current function when they
  * encounter a problem. So don't invoke them when there is memory
  * which needs to be released. Code blocks are OK, as the compiler
  * structure takes care of releasing those.  Use the arena to manage
  * objects.
+ * 注意：VISIT_*宏在遇到问题时会中止当前函数。 因此，当需要释放内存时，请不要调用它们。 代码块是可以的，因为编译器结构会负责释放它们。 使用竞技场来管理对象。
  */
 
 #include <stdbool.h>
@@ -401,6 +404,16 @@ compiler_init(struct compiler *c)
     return 1;
 }
 
+/**
+ * @brief 
+ * 
+ * @param mod   AST root node
+ * @param filename  filename
+ * @param flags    compiler flags
+ * @param optimize  optimize level
+ * @param arena     memory arena
+ * @return PyCodeObject* 
+ */
 PyCodeObject *
 _PyAST_Compile(mod_ty mod, PyObject *filename, PyCompilerFlags *flags,
                int optimize, PyArena *arena)
@@ -425,7 +438,7 @@ _PyAST_Compile(mod_ty mod, PyObject *filename, PyCompilerFlags *flags,
     Py_INCREF(filename);
     c.c_filename = filename;
     c.c_arena = arena;
-    c.c_future = _PyFuture_FromAST(mod, filename);
+    c.c_future = _PyFuture_FromAST(mod, filename);  // 从AST中获取future
     if (c.c_future == NULL)
         goto finally;
     if (!flags) {
@@ -435,26 +448,26 @@ _PyAST_Compile(mod_ty mod, PyObject *filename, PyCompilerFlags *flags,
     c.c_future->ff_features = merged;
     flags->cf_flags = merged;
     c.c_flags = flags;
-    c.c_optimize = (optimize == -1) ? _Py_GetConfig()->optimization_level : optimize;
+    c.c_optimize = (optimize == -1) ? _Py_GetConfig()->optimization_level : optimize;   // 优化级别
     c.c_nestlevel = 0;
 
     _PyASTOptimizeState state;
     state.optimize = c.c_optimize;
     state.ff_features = merged;
     // AST 优化
-    if (!_PyAST_Optimize(mod, arena, &state)) {
+    if (!_PyAST_Optimize(mod, arena, &state)) { // 优化AST
         goto finally;
     }
 
     // 访问编译器的符号表
-    c.c_st = _PySymtable_Build(mod, filename, c.c_future);
+    c.c_st = _PySymtable_Build(mod, filename, c.c_future);  // 构建符号表
     if (c.c_st == NULL) {
         if (!PyErr_Occurred())
             PyErr_SetString(PyExc_SystemError, "no symtable");
         goto finally;
     }
 
-    co = compiler_mod(&c, mod);
+    co = compiler_mod(&c, mod); // 编译模块
 
  finally:
     compiler_free(&c);
@@ -1939,7 +1952,7 @@ compiler_body(struct compiler *c, asdl_stmt_seq *stmts)
 static PyCodeObject *
 compiler_mod(struct compiler *c, mod_ty mod)
 {
-    PyCodeObject *co;
+    PyCodeObject *co;   // The code object we're building
     int addNone = 1;
     static PyObject *module;
     if (!module) {
@@ -3679,6 +3692,14 @@ inplace_binop(operator_ty op)
     }
 }
 
+/**
+ * @brief name operator，作用域，变量名，上下文
+ * 
+ * @param c 
+ * @param name 
+ * @param ctx 
+ * @return int 
+ */
 static int
 compiler_nameop(struct compiler *c, identifier name, expr_context_ty ctx)
 {
@@ -6690,7 +6711,7 @@ assemble_lnotab(struct assembler *a, struct instr *i)
 /* assemble_emit()
    Extend the bytecode with a new instruction.
    Update lnotab if necessary.
-*/
+*/ // 生成字节码
 
 static int
 assemble_emit(struct assembler *a, struct instr *i)
@@ -7103,7 +7124,7 @@ static void
 propagate_line_numbers(struct assembler *a);
 
 static PyCodeObject *
-assemble(struct compiler *c, int addNone)
+assemble(struct compiler *c, int addNone)   
 {
     basicblock *b, *entryblock;
     struct assembler a;
@@ -7177,10 +7198,10 @@ assemble(struct compiler *c, int addNone)
     propagate_line_numbers(&a);
     guarantee_lineno_for_exits(&a, c->u->u_firstlineno);
 
-    /* Order of basic blocks must have been determined by now */
+    /* Order of basic blocks must have been determined by now */        // 基础代码块的顺序必须是确定的
     normalize_jumps(&a);
 
-    /* Can't modify the bytecode after computing jump offsets. */
+    /* Can't modify the bytecode after computing jump offsets. */       // 在计算跳转偏移量之后不能修改字节码
     assemble_jump_offsets(&a, c);
 
     /* Emit code. */
